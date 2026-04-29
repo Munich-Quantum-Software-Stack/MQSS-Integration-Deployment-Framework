@@ -1,0 +1,263 @@
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+// Copyright (c) MQSS Maintainers
+
+// Protobuf message schema for the framework.
+//
+// This file defines the protobuf representation of the message structures
+// used for communication between system components.
+//
+// The schema was derived from the existing Python implementation in:
+//   https://github.com/Munich-Quantum-Software-Stack/Quantum-Common
+//   (commit e366feac5497837aedc6d9c12560cf4c19a1a643)
+//
+// Field names and structure mirror the original Python data classes
+// to remain compatible with the existing Python-based protocol.
+//
+// NOTE:
+// The Python implementation defines several logical defaults and behaviors
+// during deserialization. Proto3 does not support custom defaults for scalar
+// fields, so such behavior must be implemented in the application layer.
+//
+// COMPATIBILITY:
+// Changes to this schema must follow protobuf compatibility rules.
+// Field numbers must never be reused. Removed fields should be marked
+// as `reserved` to prevent accidental reuse.
+
+syntax = "proto3";
+
+package mqss.protocol.v1;
+
+import "google/protobuf/struct.proto";
+
+
+// Task submitted for quantum circuit execution.
+//
+// Part of the asynchronous task execution flow: QuantumTask -> QuantumResult
+//
+// A QuantumTask carries circuit execution input through the scheduling flow:
+// it is submitted by the client side, forwarded to the resource manager,
+// scheduled to a backend, and then dispatched to a quantum server for
+// execution.
+message QuantumTask {
+  // Unique task identifier.
+  // Python implementation: int.
+  int32 task_id = 1;
+
+  // Number of qubits.
+  int32 n_qbits = 2;
+
+  // Number of shots.
+  int32 n_shots = 3;
+
+  // Circuit file references.
+  // Earlier implementations also accepted a legacy field "circuit_file".
+  repeated string circuit_files = 4;
+
+  // Circuit file format/type.
+  string circuit_file_type = 5;
+
+  // Endpoint where the QuantumResult for this task should be delivered.
+  // The value is propagated through the scheduling system and used by a
+  // quantum server when publishing the final result.
+  string result_destination = 6;
+
+  // Preferred backend requested by the client.
+  string preferred_qpu = 7;
+
+  // Backend selected by the scheduler for execution.
+  string scheduled_qpu = 8;
+
+  // Scheduling priority.
+  int32 priority = 9;
+
+  // Optimization level (0-3).
+  int32 optimisation_level = 10;
+
+  // If true, modifications to the task/circuit should be avoided.
+  bool no_modify = 11;
+
+  // Enables/disables transpilation.
+  bool transpiler_flag = 12;
+
+  // Result type code.
+  // Represented as int32 because no stable enumeration is defined.
+  int32 result_type = 13;
+
+  // Submission time.
+  // Python representation: str.
+  string submit_time = 14;
+
+  // Circuit representation used during task processing.
+  // Not used in the initial client-submitted task.
+  // Currently opaque; may be defined later.
+  repeated google.protobuf.Value circuits_qiskit = 15;
+
+  // Additional human-readable diagnostic information, such as status or
+  // error messages generated during task processing.
+  string additional_information = 16;
+
+  // List of backends on which this task is allowed to run.
+  repeated string restricted_resource_names = 17;
+
+  // User identity.
+  string user_identity = 18;
+
+  // Resource access token.
+  string token = 19;
+
+  // True if the task was submitted through the HPC integration;
+  // otherwise through the portal interface.
+  bool via_hpc = 20;
+}
+
+// Measurement counts for one executed circuit.
+//
+// Each entry maps measured bitstrings to the number of times they were
+// observed during repeated execution.
+// Python representation: dict[str, int].
+message CircuitResult {
+  map<string, int32> counts = 1;
+}
+
+// Result of a completed quantum task execution.
+//
+// Part of the asynchronous task execution flow: QuantumTask -> QuantumResult
+//
+// A QuantumResult is produced after execution on a backend and carries the
+// execution outcome back through the system to the result destination.
+message QuantumResult {
+  // Identifier of the task this result belongs to.
+  int32 task_id = 1;
+
+  // Measurement results for executed circuits.
+  // Each entry contains counts for measurement bitstrings produced by
+  // repeated circuit execution (shots).
+  // Python representation: list[dict[str, int]]
+  repeated CircuitResult results = 2;
+
+  // Endpoint where the result message is delivered.
+  string destination = 3;
+
+  // Indicates whether execution completed successfully.
+  bool execution_status = 4;
+
+  // Backend that executed the task.
+  string executed_qpu = 5;
+
+  // Circuits executed for this task, serialized as OpenQASM strings.
+  repeated string executed_circuits = 6;
+
+  // Additional human-readable diagnostic information, such as status or
+  // error messages generated during task processing.
+  string additional_information = 7;
+
+  // Wall-clock execution time in seconds measured by the quantum server.
+  double execution_time = 8;
+}
+
+// Backend registration request sent by a quantum server.
+//
+// Part of a request/response interaction: QSRegisterEntry -> QSRegistrationInfo
+//
+// The quantum server sends this message to register (or deregister)
+// a backend instance with the resource manager. It advertises the
+// backend instance and the endpoint used to receive QuantumTask
+// messages from the resource manager (currently a RabbitMQ queue).
+message QSRegisterEntry {
+  // Name of the backend or quantum server.
+  string qpu_name = 1;
+
+  // Endpoint where this backend receives QuantumTask messages
+  // (currently a RabbitMQ queue).
+  string queue_name = 2;
+
+  // Endpoint where the resource manager sends QSRegistrationInfo
+  // responses for this backend instance (currently a RabbitMQ queue).
+  string control_queue_name = 3;
+
+  // Number of qubits provided by the backend.
+  int32 n_qbits = 4;
+
+  // Backend type code.
+  // Represented as int32 because no stable enumeration is defined.
+  int32 qpu_type = 5;
+
+  // If true, requests deregistration instead of registration.
+  bool deregister = 6;
+}
+
+// Response to a backend registration request.
+//
+// Part of a request/response interaction: QSRegisterEntry -> QSRegistrationInfo
+//
+// Sent by the resource manager in reply to a QSRegisterEntry request.
+// It confirms registration or deregistration and provides runtime
+// parameters such as the backend identifier and heartbeat settings.
+message QSRegistrationInfo {
+  // Unique identifier assigned by the resource manager for the backend.
+  int32 uid = 1;
+
+  // Endpoint where heartbeat messages should be sent (currently a RabbitMQ queue).
+  string heartbeat_queue = 2;
+
+  // Heartbeat interval (unit unspecified).
+  int32 heartbeat_interval = 3;
+
+  // Indicates whether the backend is deregistered after processing the request.
+  bool deregistered = 4;
+}
+
+// Status of a quantum server.
+// UNSPECIFIED (0) was added to preserve the numeric mapping of the
+// original Python implementation.
+enum QsStatus {
+  QS_STATUS_UNSPECIFIED = 0;
+  QS_STATUS_INIT = 1;
+  QS_STATUS_RUNNING = 2;
+  QS_STATUS_MAINTENANCE = 3;
+  QS_STATUS_CALIBRATION = 4;
+  QS_STATUS_CONNECTION_TIMEOUT = 5;
+}
+
+// Periodic status message sent by a registered backend instance.
+//
+// Used for asynchronous status reporting from a quantum server to
+// the resource manager or monitoring components.
+message QHeartBeat {
+  // Unique identifier assigned during registration.
+  int32 uid = 1;
+
+  // Backend name.
+  string qpu_name = 2;
+
+  // Endpoint where this backend receives QuantumTask messages
+  // (currently a RabbitMQ queue).
+  string queue_name = 3;
+
+  // Current status of the resource.
+  QsStatus status = 4;
+
+  // Current queue length.
+  int32 queue_length = 5;
+}
+
+// Backend capability information message.
+//
+// Sent asynchronously by a quantum server at startup to report backend
+// capabilities such as qubit count and connectivity.
+// It is currently consumed by the MQSS client.
+message QResourceInfo {
+  // Name of the backend or QPU.
+  string name = 1;
+
+  // Number of qubits provided by the backend.
+  int32 num_qubits = 2;
+
+  // Backend connectivity information.
+  // Python implementation: Optional[str].
+  string connectivity = 3;
+
+  // Backend instruction information.
+  // Python implementation: Optional[str].
+  string instructions = 4;
+}
