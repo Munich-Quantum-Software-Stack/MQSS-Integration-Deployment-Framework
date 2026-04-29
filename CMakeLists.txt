@@ -9,7 +9,15 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+# Protocol
 include(cmake/protobuf.cmake)
 
 add_library(mqss_protocol STATIC)
 mqss_configure_proto_target(mqss_protocol)
+
+# Tests
+include(CTest)
+
+if(BUILD_TESTING)
+  add_subdirectory(tests)
+endif()
