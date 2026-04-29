@@ -1,0 +1,42 @@
+name: Verify generated docs
+
+on:
+  pull_request:
+  push:
+    branches: [ develop ]
+
+jobs:
+  verify-docs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install protoc
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y protobuf-compiler
+
+      - name: Download protoc-gen-doc
+        run: |
+          VERSION="1.5.1"
+          ASSET="protoc-gen-doc_${VERSION}_linux_amd64.tar.gz"
+          URL="https://github.com/pseudomuto/protoc-gen-doc/releases/download/v${VERSION}/${ASSET}"
+
+          curl -fsSL "$URL" -o "$ASSET"
+          tar -xzf "$ASSET"
+          chmod +x protoc-gen-doc
+          ./protoc-gen-doc --help >/dev/null
+
+      - name: Generate docs
+        env:
+          PROTOC_GEN_DOC: ${{ github.workspace }}/protoc-gen-doc
+        run: ./scripts/gen_proto_docs.sh
+
+      - name: Verify docs are up-to-date
+        run: |
+          git diff --exit-code -- docs/ || {
+            echo "Documentation is out of date. Run ./scripts/gen_proto_docs.sh"
+            exit 1
+          }
