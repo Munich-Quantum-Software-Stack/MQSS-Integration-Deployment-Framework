@@ -5,7 +5,7 @@
 Required tools:
 
 - cmake
-- C++ toolchain
+- C++23-compatible toolchain
 - protoc (Protocol Buffers compiler)
 - protoc-gen-doc (v1.5.1)  
   <https://github.com/pseudomuto/protoc-gen-doc/releases>
