@@ -14,3 +14,15 @@ target_link_libraries(ProtobufSerialization
 )
 
 add_test(NAME ProtobufSerialization COMMAND ProtobufSerialization)
+
+add_executable(InMemoryTransportContract
+  InMemoryTransportContract.cpp
+)
+
+target_link_libraries(InMemoryTransportContract
+  PRIVATE
+    mqss_transport_inmemory
+    GTest::gtest_main
+)
+
+add_test(NAME InMemoryTransportContract COMMAND InMemoryTransportContract)

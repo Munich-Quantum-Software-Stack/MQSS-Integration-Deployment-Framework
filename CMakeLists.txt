@@ -15,6 +15,14 @@ include(cmake/protobuf.cmake)
 add_library(mqss_protocol STATIC)
 mqss_configure_proto_target(mqss_protocol)
 
+# Transport
+include(cmake/transport.cmake)
+
+mqss_add_transport(inmemory
+  SOURCES
+    src/transport/InMemoryTransport.cpp
+)
+
 # Tests
 include(CTest)
 
