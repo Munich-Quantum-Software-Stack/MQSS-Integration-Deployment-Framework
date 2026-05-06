@@ -3,41 +3,40 @@
 
 find_package(GTest REQUIRED)
 
-add_executable(ProtobufSerialization
-  ProtobufSerialization.cpp
-)
-
-target_link_libraries(ProtobufSerialization
-  PRIVATE
-    mqss_protocol
-    GTest::gtest_main
-)
-
-add_test(NAME ProtobufSerialization COMMAND ProtobufSerialization)
-
-add_executable(InMemoryTransportContract
-  InMemoryTransportContract.cpp
-)
-
-target_link_libraries(InMemoryTransportContract
-  PRIVATE
-    mqss_transport_inmemory
-    GTest::gtest_main
-)
-
-add_test(NAME InMemoryTransportContract COMMAND InMemoryTransportContract)
-
-if(MQSS_ENABLE_RABBITMQ_TRANSPORT)
-  add_executable(RabbitMqTransportContract
-    RabbitMqTransportContract.cpp
+function(mqss_add_test name)
+  add_executable(${name}
+    ${name}.cpp
   )
 
-  target_link_libraries(RabbitMqTransportContract
+  target_link_libraries(${name}
     PRIVATE
-      mqss_transport_rabbitmq_simple
+      ${ARGN}
       GTest::gtest_main
   )
 
-  add_test(NAME RabbitMqTransportContract
-           COMMAND RabbitMqTransportContract)
+  add_test(NAME ${name} COMMAND ${name})
+endfunction()
+
+mqss_add_test(ProtobufSerialization
+  mqss_protocol
+)
+
+mqss_add_test(InMemoryTransportContract
+  mqss_transport_inmemory
+)
+
+mqss_add_test(InMemoryTyped
+  mqss_protocol
+  mqss_transport_inmemory
+)
+
+if(MQSS_ENABLE_RABBITMQ_TRANSPORT)
+  mqss_add_test(RabbitMqTransportContract
+    mqss_transport_rabbitmq_simple
+  )
+
+  mqss_add_test(RabbitMqTyped
+    mqss_protocol
+    mqss_transport_rabbitmq_simple
+  )
 endif()

@@ -2,8 +2,10 @@
 // Copyright (c) MQSS Maintainers
 
 /// \file
-/// Public protocol message aliases.
+/// Protocol definitions: codecs and message type aliases.
 
 #pragma once
 
+#include "mqss/protocol/Codec.hpp"
+#include "mqss/protocol/ProtoCodec.hpp"
 #include "mqss/protocol/ProtoProtocol.hpp"

@@ -39,9 +39,11 @@ bool rabbitmq_up = false;
 std::string rabbitmq_error;
 
 #define REQUIRE_RABBITMQ()                                                     \
-  if (!rabbitmq_up) {                                                          \
-    GTEST_SKIP() << "RabbitMQ unavailable: " << rabbitmq_error;                \
-  }
+  do {                                                                         \
+    if (!rabbitmq_up) {                                                        \
+      GTEST_SKIP() << "RabbitMQ broker unavailable: " << rabbitmq_error;       \
+    }                                                                          \
+  } while (false)
 
 // Helper: check if Result<T> contains a specific Status code.
 template <class T>
@@ -50,7 +52,7 @@ bool hasStatusCode(const mqss::Result<T> &result, mqss::StatusCode code) {
 }
 
 // Generate a unique queue name for one test case.
-static std::string uniqueName(const std::string &prefix) {
+std::string uniqueName(const std::string &prefix) {
   static thread_local std::mt19937_64 rng{std::random_device{}()};
   return prefix + "." + std::to_string(rng());
 }
@@ -78,7 +80,7 @@ TEST(RabbitMqTransportContract, BrokerAvailability) {
 
   rabbitmq_error = result.error().reason();
 
-  FAIL() << "RabbitMQ unavailable: " << rabbitmq_error;
+  FAIL() << "RabbitMQ broker unavailable: " << rabbitmq_error;
 }
 
 // send() -> receive() basic roundtrip.
