@@ -23,6 +23,19 @@ mqss_add_transport(inmemory
     src/transport/InMemoryTransport.cpp
 )
 
+option(MQSS_ENABLE_RABBITMQ_TRANSPORT "Build RabbitMQ transport" ON)
+
+if(MQSS_ENABLE_RABBITMQ_TRANSPORT)
+  include(cmake/SimpleAmqpClient.cmake)
+
+  mqss_add_transport(rabbitmq_simple
+    SOURCES
+      src/transport/RabbitMqSimpleTransport.cpp
+    PRIVATE_LIBS
+      SimpleAmqpClient
+  )
+endif()
+
 # Tests
 include(CTest)
 

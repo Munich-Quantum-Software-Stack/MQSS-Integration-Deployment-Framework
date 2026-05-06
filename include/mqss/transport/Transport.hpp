@@ -6,13 +6,14 @@
 
 #pragma once
 
-#include <mqss/Message.hpp>
-#include <mqss/Status.hpp>
+#include "mqss/Message.hpp"
+#include "mqss/Status.hpp"
 
 #include <chrono>
 #include <cstddef>
 #include <functional>
 #include <initializer_list>
+#include <memory>
 #include <optional>
 #include <utility>
 
@@ -174,5 +175,17 @@ protected:
                            std::move(nack_fn));
   }
 };
+
+/// Backend selection and construction.
+///
+/// Transport backends are selected using type-level backend tags.
+/// Each backend provides a corresponding `TransportOptions<Backend>`
+/// specialization and a `createTransport<Backend>(...)` factory.
+template <class TransportBackend>
+struct TransportOptions;
+
+template <class TransportBackend>
+std::unique_ptr<Transport>
+createTransport(const TransportOptions<TransportBackend> &options = {});
 
 } // namespace mqss

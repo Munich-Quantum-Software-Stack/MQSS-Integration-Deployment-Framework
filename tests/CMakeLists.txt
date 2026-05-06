@@ -26,3 +26,18 @@ target_link_libraries(InMemoryTransportContract
 )
 
 add_test(NAME InMemoryTransportContract COMMAND InMemoryTransportContract)
+
+if(MQSS_ENABLE_RABBITMQ_TRANSPORT)
+  add_executable(RabbitMqTransportContract
+    RabbitMqTransportContract.cpp
+  )
+
+  target_link_libraries(RabbitMqTransportContract
+    PRIVATE
+      mqss_transport_rabbitmq_simple
+      GTest::gtest_main
+  )
+
+  add_test(NAME RabbitMqTransportContract
+           COMMAND RabbitMqTransportContract)
+endif()

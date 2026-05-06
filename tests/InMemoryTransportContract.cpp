@@ -24,7 +24,7 @@ namespace {
 // Helper: check if Result<T> contains a specific Status code.
 template <class T>
 bool hasStatusCode(const mqss::Result<T> &result, mqss::StatusCode code) {
-  return !result && result.error().code() == code;
+  return !result.has_value() && result.error().code() == code;
 }
 
 } // namespace
@@ -152,10 +152,10 @@ TEST(InMemoryTransportContract, DestroyCompletesPendingReceive) {
   EXPECT_TRUE(hasStatusCode(result, mqss::StatusCode::Unavailable));
 }
 
-/// Multiple concurrent senders and receivers should deliver all messages once.
+// Multiple concurrent senders and receivers should deliver all messages once.
 TEST(InMemoryTransportContract, ConcurrentSendAndReceive) {
   auto transport = mqss::createTransport<mqss::InMemory>();
-  mqss::Address a{"queue.concurrent"};
+  mqss::Address address{"queue.concurrent"};
 
   constexpr int sender_count = 4;
   constexpr int messages_per_sender = 25;
@@ -170,7 +170,8 @@ TEST(InMemoryTransportContract, ConcurrentSendAndReceive) {
   for (int i = 0; i < total_messages; ++i) {
     receivers.push_back(std::async(std::launch::async, [&] {
       auto result = transport->receive(
-          a, mqss::ReceiveArgs{.timeout = 1s, .ack_mode = mqss::AckMode::Auto});
+          address,
+          mqss::ReceiveArgs{.timeout = 1s, .ack_mode = mqss::AckMode::Auto});
 
       ASSERT_TRUE(result);
       received_count.fetch_add(1);
@@ -181,10 +182,11 @@ TEST(InMemoryTransportContract, ConcurrentSendAndReceive) {
   for (int s = 0; s < sender_count; ++s) {
     senders.push_back(std::async(std::launch::async, [&, s] {
       for (int i = 0; i < messages_per_sender; ++i) {
-        mqss::Envelope e;
-        e.payload = "sender-" + std::to_string(s) + "-msg-" + std::to_string(i);
+        mqss::Envelope envelope;
+        envelope.payload =
+            "sender-" + std::to_string(s) + "-msg-" + std::to_string(i);
 
-        EXPECT_TRUE(transport->send(a, e).ok());
+        EXPECT_TRUE(transport->send(address, envelope).ok());
       }
     }));
   }
