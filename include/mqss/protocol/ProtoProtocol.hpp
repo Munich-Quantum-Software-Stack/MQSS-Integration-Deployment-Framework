@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "v1/messages.pb.h"
+#include "mqss/protocol/v1/messages.pb.h"
 
 namespace mqss {
 

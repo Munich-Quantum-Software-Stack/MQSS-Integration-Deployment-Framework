@@ -5,7 +5,7 @@
 // Verifies binary and JSON serialization/parse behavior for predefined protocol
 // messages.
 
-#include "v1/messages.pb.h"
+#include "mqss/protocol/v1/messages.pb.h"
 
 #include <google/protobuf/util/json_util.h>
 #include <gtest/gtest.h>

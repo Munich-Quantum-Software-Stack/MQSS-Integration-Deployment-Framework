@@ -9,7 +9,7 @@ function(mqss_configure_proto_target target_name)
   )
 
   set(GENERATED_DIR ${CMAKE_CURRENT_BINARY_DIR}/generated)
-  set(CXX_PROTO_OUT_DIR ${GENERATED_DIR}/v1)
+  set(CXX_PROTO_OUT_DIR ${GENERATED_DIR}/mqss/protocol/v1)
 
   file(MAKE_DIRECTORY ${CXX_PROTO_OUT_DIR})
 
@@ -33,6 +33,7 @@ function(mqss_configure_proto_target target_name)
 
   target_include_directories(${target_name}
     PUBLIC
-      ${GENERATED_DIR}
+      $<BUILD_INTERFACE:${GENERATED_DIR}>
+      $<INSTALL_INTERFACE:include>
   )
 endfunction()

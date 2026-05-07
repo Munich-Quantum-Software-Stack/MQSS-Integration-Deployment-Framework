@@ -19,6 +19,7 @@ function(mqss_add_transport name)
 
   target_include_directories(${target}
     PUBLIC
-      ${PROJECT_SOURCE_DIR}/include
+      $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+      $<INSTALL_INTERFACE:include>
   )
 endfunction()
