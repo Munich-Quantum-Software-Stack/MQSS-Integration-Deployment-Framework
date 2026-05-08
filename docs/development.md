@@ -97,7 +97,16 @@ CLEAN=1 \
 BUILD_TYPE=Debug \
 BUILD_DIR=build-debug \
 INSTALL_DIR=/tmp/mqss-debug-install \
+RUN_RABBITMQ_TESTS=1 \
 scripts/check_install.sh
+```
+
+## Docker Development Container
+
+Build and enter the MQSS development container:
+
+```bash
+NO_CACHE=1 scripts/docker_dev.sh
 ```
 
 ## Generate Protocol Documentation

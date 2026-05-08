@@ -2,15 +2,24 @@
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 # Copyright (c) MQSS Maintainers
 
-set -euo pipefail
+set -eu
 
 BUILD_DIR="${BUILD_DIR:-build}"
 INSTALL_DIR="${INSTALL_DIR:-/tmp/mqss-install}"
 EXAMPLE_BUILD_DIR="${EXAMPLE_BUILD_DIR:-examples/mqss_consumer/build}"
 BUILD_TYPE="${BUILD_TYPE:-Release}"
+RUN_RABBITMQ_TESTS="${RUN_RABBITMQ_TESTS:-0}"
 
 if [[ "${CLEAN:-0}" == "1" ]]; then
   rm -rf "${BUILD_DIR}"
+fi
+
+CTEST_ARGS=(
+  --output-on-failure
+)
+
+if [[ "${RUN_RABBITMQ_TESTS}" != "1" ]]; then
+  CTEST_ARGS+=(-E RabbitMq)
 fi
 
 cmake -S . -B "${BUILD_DIR}" \
@@ -18,7 +27,7 @@ cmake -S . -B "${BUILD_DIR}" \
 
 cmake --build "${BUILD_DIR}"
 
-ctest --test-dir "${BUILD_DIR}" --output-on-failure
+ctest --test-dir "${BUILD_DIR}" "${CTEST_ARGS[@]}"
 
 rm -rf "${INSTALL_DIR}"
 cmake --install "${BUILD_DIR}" --prefix "${INSTALL_DIR}"
