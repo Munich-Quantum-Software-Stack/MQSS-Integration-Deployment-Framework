@@ -1,0 +1,5 @@
+BasedOnStyle: LLVM
+AlwaysBreakTemplateDeclarations: Yes
+InsertNewlineAtEOF: Yes
+ReflowComments: true
+

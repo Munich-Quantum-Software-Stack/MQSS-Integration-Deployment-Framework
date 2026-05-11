@@ -36,3 +36,9 @@ The framework allows flexible deployment without changes to application logic:
 
 - **Hybrid systems**
   A combination of both approaches, where some components communicate locally while others use a messaging backend.
+
+## Documentation
+
+Additional project documentation is available in:
+
+- [Project Documentation](docs/index.md)

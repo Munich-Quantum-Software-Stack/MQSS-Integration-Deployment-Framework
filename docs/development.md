@@ -114,3 +114,9 @@ NO_CACHE=1 scripts/docker_dev.sh
 ```bash
 scripts/gen_proto_docs.sh
 ```
+
+## Generate Doxygen Documentation
+
+```bash
+doxygen Doxyfile
+```
