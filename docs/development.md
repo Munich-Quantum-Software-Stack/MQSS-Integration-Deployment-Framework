@@ -10,13 +10,14 @@ Required tools:
 - protoc-gen-doc (v1.5.1)  
   <https://github.com/pseudomuto/protoc-gen-doc/releases>
 - GoogleTest
-- RabbitMQ C library development package
+- RabbitMQ C library development package (for RabbitMQ transport)
+- MPI implementation with C++ support (for MPI transport)
 
 ### System Install (Ubuntu/Debian)
 
 ```bash
 sudo apt install build-essential cmake protobuf-compiler libprotobuf-dev \
-  libgtest-dev librabbitmq-dev
+  libgtest-dev librabbitmq-dev libopenmpi-dev openmpi-bin
 ````
 
 ## Build

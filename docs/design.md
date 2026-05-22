@@ -36,7 +36,7 @@ Payload encoding is separated from message delivery, and optional transport feat
 An address identifies a transport-specific endpoint.
 
 The interpretation of an address depends on the transport backend.
-Examples include queue names, topics, service identifiers, or logical endpoints.
+Examples include queue names, topics, service identifiers, MPI ranks, or logical endpoints.
 
 ### Envelope
 
@@ -170,6 +170,33 @@ Capability availability depends on broker behavior and transport configuration.
 ### Configuration
 
 The transport is configured through backend-specific option structures that define connection parameters and transport settings.
+
+## MPI Transport
+
+The MPI transport provides a transport implementation based on MPI point-to-point communication.
+
+It enables communication between distributed processes participating in the same MPI environment while preserving the common transport abstraction.
+
+### Behavior
+
+- Addresses are interpreted as MPI ranks within a configured communicator.
+- Message delivery uses MPI point-to-point communication.
+- Receive operations support blocking and bounded-wait semantics.
+- The transport duplicates and manages its own MPI communicator instance.
+- MPI initialization may be managed externally or optionally by the transport.
+
+### Capabilities
+
+The MPI transport currently provides basic message delivery functionality and does not support advanced messaging features.
+
+### Configuration
+
+The transport is configured through backend-specific option structures that define:
+
+- the MPI communicator
+- the MPI message tag
+- MPI initialization behavior
+- required MPI thread support level
 
 ## Messenger
 

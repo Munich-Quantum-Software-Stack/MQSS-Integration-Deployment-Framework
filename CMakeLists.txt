@@ -41,6 +41,19 @@ if(MQSS_ENABLE_RABBITMQ_TRANSPORT)
   )
 endif()
 
+option(MQSS_ENABLE_MPI_TRANSPORT "Build MPI transport" ON)
+
+if(MQSS_ENABLE_MPI_TRANSPORT)
+  find_package(MPI REQUIRED COMPONENTS CXX)
+
+  mqss_add_transport(mpi
+    SOURCES
+      src/transport/MpiTransport.cpp
+    PUBLIC_LIBS
+      MPI::MPI_CXX
+  )
+endif()
+
 # Public aggregate target
 add_library(mqss INTERFACE)
 add_library(mqss::mqss ALIAS mqss)
@@ -55,6 +68,13 @@ if(MQSS_ENABLE_RABBITMQ_TRANSPORT)
   target_link_libraries(mqss
     INTERFACE
       mqss_transport_rabbitmq_simple
+  )
+endif()
+
+if(MQSS_ENABLE_MPI_TRANSPORT)
+  target_link_libraries(mqss
+    INTERFACE
+      mqss_transport_mpi
   )
 endif()
 
