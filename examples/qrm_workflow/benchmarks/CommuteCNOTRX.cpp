@@ -1,0 +1,32 @@
+
+
+#include <cudaq.h>
+#include <fstream>
+#include <iostream>
+
+// Define a CUDA-Q kernel that is fully specified
+// at compile time via templates.
+template <std::size_t N> struct CNOTRX {
+  auto operator()() __qpu__ {
+
+    // Compile-time sized array like std::array
+    cudaq::qarray<N> q;
+    x(q[1]);
+    x<cudaq::ctrl>(q[0], q[1]);
+    x<cudaq::ctrl>(q[0], q[1]);
+    x<cudaq::ctrl>(q[0], q[1]);
+    x<cudaq::ctrl>(q[0], q[1]);
+    x<cudaq::ctrl>(q[0], q[1]);
+    x(q[1]);
+    x<cudaq::ctrl>(q[1], q[0]);
+    mz(q[0]);
+    mz(q[1]);
+  }
+};
+
+int main() {
+  auto kernel = CNOTRX<2>{};
+  auto counts = cudaq::sample(kernel);
+  counts.dump();
+  return 0;
+}
