@@ -12,12 +12,32 @@ Required tools:
 - GoogleTest
 - RabbitMQ C library development package
 
-### System Install (Ubuntu/Debian)
+### Project Dependencies
+
+Required for MQSS development, testing, and documentation generation:
 
 ```bash
 sudo apt install build-essential cmake protobuf-compiler libprotobuf-dev \
-  libgtest-dev librabbitmq-dev
+  libgtest-dev librabbitmq-dev libboost-chrono-dev libboost-system-dev \
+  doxygen graphviz
 ````
+
+### Project Examples
+
+Additional dependencies required by the project examples:
+
+```bash
+sudo apt install libspdlog-dev libfmt-dev
+```
+
+### MQSSCI Dependencies
+
+Additional dependencies required by the MQSSCI toolchain integration:
+
+```bash
+sudo apt install curl wget ninja-build libbz2-dev libssl-dev libffi-dev \
+  libncurses-dev libreadline-dev libsqlite3-dev liblzma-dev libzstd-dev
+```
 
 ## Build
 
@@ -101,12 +121,44 @@ RUN_RABBITMQ_TESTS=1 \
 scripts/check_install.sh
 ```
 
+## Build and Run QRM Workflow Example
+
+Perform an end-to-end build and execution check:
+
+```bash
+scripts/check_qrm_workflow.sh
+```
+
+See [QRM Workflow Example](examples/qrm_workflow.md) for details.
+
 ## Docker Development Container
 
 Build and enter the MQSS development container:
 
 ```bash
 NO_CACHE=1 scripts/docker_dev.sh
+```
+
+## Docker Workflow Environment
+
+Start the RabbitMQ-backed workflow development environment:
+
+```bash
+scripts/docker_workflow.sh
+```
+
+This command builds the development image if needed, starts RabbitMQ using Docker Compose, and opens a shell in the workflow container.
+
+The workflow container is configured to connect to the RabbitMQ service as:
+
+```bash
+QRM_AMQP_HOST=rabbitmq
+```
+
+Stop the workflow environment:
+
+```bash
+DOWN=1 scripts/docker_workflow.sh
 ```
 
 ## Generate Protocol Documentation
