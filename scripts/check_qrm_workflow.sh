@@ -26,7 +26,8 @@ cmake --install "${BUILD_DIR}" --prefix "${INSTALL_DIR}"
 
 rm -rf "${QRM_BUILD_DIR}"
 cmake -S examples/qrm_workflow -B "${QRM_BUILD_DIR}" \
-  -DCMAKE_PREFIX_PATH="${INSTALL_DIR}"
+  -DCMAKE_PREFIX_PATH="${INSTALL_DIR}" \
+  -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++
 
 cmake --build "${QRM_BUILD_DIR}"
 

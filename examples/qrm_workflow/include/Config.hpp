@@ -24,6 +24,7 @@ struct QueueConfig {
   std::string scheduler;
   std::string compiler;
   std::string results;
+  std::string submitter;
 };
 
 struct LoggingConfig {
@@ -32,10 +33,12 @@ struct LoggingConfig {
   std::string daemon_logger;
   std::string scheduler_logger;
   std::string compiler_logger;
+  std::string submitter_logger;
 
   std::string daemon_log;
   std::string scheduler_log;
   std::string compiler_log;
+  std::string submitter_log;
 };
 
 struct ToolConfig {

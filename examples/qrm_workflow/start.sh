@@ -12,6 +12,9 @@ SCHEDULER_PID=$!
 ./compiler &
 COMPILER_PID=$!
 
+./submitter &
+COMPILER_PID=$!
+
 ./daemon &
 DAEMON_PID=$!
 
