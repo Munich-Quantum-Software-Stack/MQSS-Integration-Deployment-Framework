@@ -58,8 +58,7 @@ static std::tuple<std::string, std::string> extractQDMIObj(std::string conf_path
 
 // Load the device library dynamically
 static std::pair<std::reference_wrapper<qdmi_main_driver::Driver>, QDMI_Device>
-addDynamicDeviceLibrary(const std::string &libName, const std::string &prefix,
-                        std::shared_ptr<spdlog::logger> MQSSLogger) {
+addDynamicDeviceLibrary(const std::string &libName, const std::string &prefix) {
 
   qdmi_main_driver::DeviceSessionConfig config;
   // If connecting to a remote device, use:
@@ -88,7 +87,7 @@ addDynamicDeviceLibrary(const std::string &libName, const std::string &prefix,
                                           namesSize, name.data(), nullptr);
 
   assert(ret == QDMI_SUCCESS);
-  MQSSLogger->info("Device name: {} ", name);
+  spdlog::info("Device name: {} ", name);
   return std::make_pair(std::ref(driver), device);
 }
 
@@ -101,12 +100,11 @@ addDynamicDeviceLibrary(const std::string &libName, const std::string &prefix,
 //       queried.
 static mqss::QuantumResult
 createAndSubmitQDMIJobToQDMIDevice(mqss::QuantumTask task,
-                                   const std::string &device_conf_path,
-                                   std::shared_ptr<spdlog::logger> MQSSLogger) {
+                                   const std::string &device_conf_path) {
 
   auto [libName, prefix] = extractQDMIObj(device_conf_path);
 
-  auto [driver_ref, dev] = addDynamicDeviceLibrary(libName, prefix, MQSSLogger);
+  auto [driver_ref, dev] = addDynamicDeviceLibrary(libName, prefix);
   QDMI_Job job = nullptr;
   int ret = 0;
 
@@ -118,7 +116,7 @@ createAndSubmitQDMIJobToQDMIDevice(mqss::QuantumTask task,
   ret = QDMI_device_create_job(dev, &job);
   assert(ret == QDMI_SUCCESS);
 
-  MQSSLogger->info("Created QDMI Job...");
+  spdlog::info("Created QDMI Job...");
   // Set Properties for the Job
   // Properties set:
   //    1. Circuit format (QIR-base profile or OPENQASM2)
@@ -139,18 +137,18 @@ createAndSubmitQDMIJobToQDMIDevice(mqss::QuantumTask task,
     ret = QDMI_job_set_parameter(job, QDMI_JOB_PARAMETER_SHOTSNUM,
                                  sizeof(size_t), &num_shots);
     assert(ret == QDMI_SUCCESS);
-    MQSSLogger->info("--> QDMI Num shots: " + std::to_string(num_shots));
+    spdlog::info("--> QDMI Num shots: " + std::to_string(num_shots));
   }
 
-  MQSSLogger->info("QDMI Job parameters Set...");
+  spdlog::info("QDMI Job parameters Set...");
   // Submit the job and wait
   ret = QDMI_job_submit(job);
   assert(ret == QDMI_SUCCESS);
 
-  MQSSLogger->info("QDMI Job submitted to QDMI Device...");
+  spdlog::info("QDMI Job submitted to QDMI Device...");
   ret = QDMI_job_wait(job, 0);
   if (ret != QDMI_SUCCESS) {
-    MQSSLogger->error("QDMI job wait failed with: {}", ret);
+    spdlog::error("QDMI job wait failed with: {}", ret);
   }
 
   assert(ret == QDMI_SUCCESS);
@@ -203,7 +201,7 @@ createAndSubmitQDMIJobToQDMIDevice(mqss::QuantumTask task,
 
   auto *res = result.add_results();
   if (key_vec.size() != counts.size()) {
-    MQSSLogger->error("Size of Keys Vector not equal to Number of Counts!");
+    spdlog::error("Size of Keys Vector not equal to Number of Counts!");
   };
 
   // Gather the counts within the result object
@@ -226,7 +224,7 @@ mqss::examples::qrm_workflow::initConfig(
   auto config = mqss::examples::qrm_workflow::getConfig();
 
   auto logger = mqss::examples::qrm_workflow::makeLogger(
-      config.logging.compiler_logger, config.logging.compiler_log);
+      config.logging.submitter_logger, config.logging.submitter_log);
 
   // Use a process-specific default logger to avoid passing logger objects.
   spdlog::set_default_logger(logger);
@@ -262,7 +260,7 @@ mqss::examples::qrm_workflow::initConfig(
 
     mqss::QuantumTask &task = *res;
     logger->info("Processing new task with id: {}", task.task_id());
-
+  
     // Debugging: Print Circuit files received (qasm or qir)...
     // logger->info("-->Decoded task id: {}", task.task_id());
     // logger->info("-->New Circuit files dump:\n");
@@ -274,11 +272,11 @@ mqss::examples::qrm_workflow::initConfig(
     // prepare QDMI job and submit
     // Set the path to the QDMI Device Shared Object file
 
-    std::string device_prefix = "/workspaces/QRM/qdmi_device_objs/mqt_qdmi.conf";
-    logger->info("Device conf is: " + device_prefix);
+    std::string device_prefix = config.paths.qdmi_device_objs_dir + "/mqt_qdmi_ddsim.conf";
+    spdlog::info("Device conf is: " + device_prefix);
 
     auto circuit_result = createAndSubmitQDMIJobToQDMIDevice(
-        task, device_prefix, logger);
+        task, device_prefix);
 
     // auto circuit_result =
     //     createAndSubmitQDMIJob(task, device_conf.c_str(), std::move(logger));

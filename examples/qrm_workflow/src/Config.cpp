@@ -69,6 +69,8 @@ Config loadConfig(int argc, char **argv) {
               .compiler =
                   getEnvOr("QRM_COMPILER_QUEUE", defaults::compiler_queue),
               .results = getEnvOr("QRM_RESULTS_QUEUE", defaults::results_queue),
+               .submitter =
+                  getEnvOr("QRM_SUBMITTER_QUEUE", defaults::submitter_queue),
           },
 
       .logging =
@@ -78,10 +80,12 @@ Config loadConfig(int argc, char **argv) {
               .daemon_logger = "mqss::Daemon",
               .scheduler_logger = "mqss::Scheduler",
               .compiler_logger = "mqss::Compiler",
+              .submitter_logger = "mqss::Submitter",
 
               .daemon_log = logPath(log_dir, "daemon.log"),
               .scheduler_log = logPath(log_dir, "scheduler.log"),
               .compiler_log = logPath(log_dir, "compiler.log"),
+              .submitter_log = logPath(log_dir, "submitter.log"),
           },
 
       .tools =
@@ -98,6 +102,8 @@ Config loadConfig(int argc, char **argv) {
           {
               .benchmark_dir =
                   getEnvOr("QRM_BENCHMARK_DIR", defaults::benchmark_dir),
+              .qdmi_device_objs_dir = getEnvOr("QRM_QDMI_DEVICES_DIR",
+                                               defaults::qdmi_device_objs_dir),
           },
   };
 

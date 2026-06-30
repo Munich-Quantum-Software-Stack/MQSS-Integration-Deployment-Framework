@@ -10,12 +10,11 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(mqss REQUIRED)
-find_package(spdlog CONFIG REQUIRED)
-
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 find_package(MQSSCI REQUIRED)
 find_package(qdmi REQUIRED)
 find_package(qinfo REQUIRED)
+find_package(Spdlog REQUIRED)
 
 include(Config.cmake)
 

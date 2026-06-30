@@ -16,6 +16,28 @@
 #include <unistd.h>
 #include <unordered_map>
 
+std::string stripSpuriousGateDefs(const std::string& qasm) {
+    std::istringstream stream(qasm);
+    std::ostringstream result;
+    std::string line;
+    bool inGateBlock = false;
+    while (std::getline(stream, line)) {
+        if (line.find("gate ") != std::string::npos && 
+            line.find("{") != std::string::npos) {
+            inGateBlock = true;
+            continue;
+        }
+        if (inGateBlock) {
+            if (line.find("}") != std::string::npos) {
+                inGateBlock = false;
+            }
+            continue;
+        }
+        result << line << "\n";
+    }
+    return result.str();
+}
+
 // Invokes cudaq-quake on `src_path` which convert the source to quake mlir
 // dialect. Then mqss-cudaq-opt is called to invoke mqss-passes on the quake
 // dialect Finally, cudaq-translate is called to translate the output to qasm or
@@ -24,7 +46,7 @@
 static std::string
 lowerToOutputFormat(const std::string &src_path, int opt_level,
                     const std::string &target_qpu,
-                    const std::string &result_type = "qir-base") {
+                    const std::string &result_type) {
 
   // Write output to a temp file
   char tmp_path[] = "/tmp/mqss_quake_XXXXXX";
@@ -44,7 +66,7 @@ lowerToOutputFormat(const std::string &src_path, int opt_level,
   else if (target_qpu == "oqc")
     decomposition_cmd = "--oqc-gate-set-mapping";
   else
-    throw std::runtime_error("unknown target QPU selected: " + target_qpu);
+    decomposition_cmd = "";
 
   auto tools = mqss::examples::qrm_workflow::getConfig().tools;
 
@@ -94,7 +116,11 @@ static void applyOptimizationPasses(mqss::QuantumTask &task) {
 
     // Final argument to lowerToOutputFormat can be set to:
     // "qir", "qir-full", "qir-adaptive", "qir-base", "openqasm2"
-    auto out_res = lowerToOutputFormat(circuit_file, opt_level, qpu);
+    std::string result_type = "openqasm2";
+    auto out_res = lowerToOutputFormat(circuit_file, opt_level, qpu, result_type);
+    if(result_type == "openqasm2"){
+      out_res = stripSpuriousGateDefs(out_res);
+    }
 
     updated_circuit_files[i] = out_res;
   }
@@ -157,10 +183,15 @@ int main(int argc, char **argv) {
       continue;
     }
 
-    auto send_st = messenger.send<mqss::QuantumTask>(
-        {task.result_destination()}, // use the queue the daemon specified
-        task);
+    spdlog::info("-->Compiler output:");
+    for(auto c : task.circuit_files()){
+      spdlog::info(c);
+    }
 
+   auto send_st = messenger.send<mqss::QuantumTask>(
+        {std::string(config.queues.submitter)}, task);
+
+    logger->info("Task sent by compiler!");
     if (!send_st.ok()) {
       spdlog::error("Failed to send result for task {}: {}", task.task_id(),
                     send_st.reason());

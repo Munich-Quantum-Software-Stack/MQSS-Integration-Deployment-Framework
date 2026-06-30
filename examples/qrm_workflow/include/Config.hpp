@@ -50,6 +50,7 @@ struct ToolConfig {
 
 struct PathConfig {
   std::string benchmark_dir;
+  std::string qdmi_device_objs_dir;
 };
 
 struct Config {

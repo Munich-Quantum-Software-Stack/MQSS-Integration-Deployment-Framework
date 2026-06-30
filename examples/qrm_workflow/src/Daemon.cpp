@@ -10,6 +10,7 @@
 
 #include <chrono>
 #include <filesystem>
+#include <mqss/protocol/ProtoProtocol.hpp>
 #include <string>
 
 int main(int argc, char **argv) {
@@ -36,15 +37,15 @@ int main(int argc, char **argv) {
 
   mqss::QuantumTask task{};
   task.set_task_id(111);
-  task.set_n_qbits(6);
-  task.set_n_shots(2048);
+  task.set_n_qbits(2);
+  task.set_n_shots(0);
   task.set_optimisation_level(1);
   task.set_result_destination(std::string(config.queues.results));
   task.set_preferred_qpu(
-      "iqm"); // Either iqm, fermioniq, ionq, oqc, quantinuum, qci
+      ""); // Either iqm, fermioniq, ionq, oqc, quantinuum, qci
 
   auto circuit_file_path = std::filesystem::path(config.paths.benchmark_dir) /
-                           "DoubleCnotCancellation.cpp";
+                           "bell_state.cpp";
 
   task.add_circuit_files(circuit_file_path);
   task.set_circuit_file_type("cpp");
@@ -59,7 +60,7 @@ int main(int argc, char **argv) {
 
   spdlog::info("Task sent");
 
-  auto res = messenger.receive<mqss::QuantumTask>(
+  auto res = messenger.receive<mqss::QuantumResult>(
       {task.result_destination()},
       mqss::ReceiveArgs{
           .timeout = std::chrono::milliseconds(60000),
@@ -72,14 +73,20 @@ int main(int argc, char **argv) {
   }
 
   spdlog::info("Task received by daemon queue");
-
-  const auto &decoded = *res;
-
-  spdlog::info("Decoded task id: {}", decoded.task_id());
-  spdlog::info("New circuit files dump:");
-
-  for (const auto &circuit : decoded.circuit_files()) {
-    spdlog::info("{}", circuit);
+  
+  if (res.has_value()) {
+    spdlog::info("Results Received by Test/Daemon Queue!");
+    const auto &decoded = *res;
+    spdlog::info("-->Decoded task id: {}", decoded.task_id());
+    spdlog::info("-->Executed Circuit files dump:\n");
+    auto decoded_circuits = decoded.executed_circuits();
+    for (auto circuit : decoded_circuits) {
+      spdlog::info(circuit);
+    }
+    spdlog::info("-->Results:");
+    for(auto [key, count] : decoded.results(0).counts()){
+        spdlog::info("count[{}] : {}" , key, count);
+    }
   }
 
   // use decoded.task_id(), decoded.n_qbits(), etc.
