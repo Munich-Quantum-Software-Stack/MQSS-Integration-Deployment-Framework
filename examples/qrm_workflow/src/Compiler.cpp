@@ -191,7 +191,7 @@ int main(int argc, char **argv) {
    auto send_st = messenger.send<mqss::QuantumTask>(
         {std::string(config.queues.submitter)}, task);
 
-    logger->info("Task sent by compiler!");
+    spdlog::info("Task sent by compiler!");
     if (!send_st.ok()) {
       spdlog::error("Failed to send result for task {}: {}", task.task_id(),
                     send_st.reason());

@@ -8,7 +8,7 @@
 namespace mqss::examples::qrm_workflow::defaults {
 
 // Static defaults.
-inline constexpr std::string_view amqp_host = "rabbitmq";
+inline constexpr std::string_view amqp_host = "localhost";
 inline constexpr int amqp_port = 5672;
 inline constexpr std::string_view amqp_user = "myuser";
 inline constexpr std::string_view amqp_password = "mypassword";
@@ -28,5 +28,8 @@ inline constexpr std::string_view cudaq_translate = "@QRM_CUDAQ_TRANSLATE@";
 inline constexpr std::string_view log_dir = "@QRM_LOG_DIR@";
 inline constexpr std::string_view benchmark_dir = "@QRM_BENCHMARK_DIR@";
 inline constexpr std::string_view qdmi_device_objs_dir = "@QRM_QDMI_DEVICES_DIR@";
+
+inline constexpr std::string_view qdmi_device_obj = "libmqt-core-qdmi-ddsim-device.so.3.3.4";
+inline constexpr std::string_view qdmi_device_prefix = "MQT_DDSIM";
 
 } // namespace mqss::examples::qrm_workflow::defaults

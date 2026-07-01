@@ -10,7 +10,6 @@
 
 #include <chrono>
 #include <filesystem>
-#include <mqss/protocol/ProtoProtocol.hpp>
 #include <string>
 
 int main(int argc, char **argv) {

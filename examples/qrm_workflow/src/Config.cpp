@@ -105,6 +105,10 @@ Config loadConfig(int argc, char **argv) {
               .qdmi_device_objs_dir = getEnvOr("QRM_QDMI_DEVICES_DIR",
                                                defaults::qdmi_device_objs_dir),
           },
+        .devices{
+            .qdmi_device_obj = getEnvOr("QDMI_DEVICE_OBJ", defaults::qdmi_device_obj),
+            .qdmi_device_prefix = getEnvOr("QDMI_DEVICE_PREFIX", defaults::qdmi_device_prefix),
+        }
   };
 
   // Integrate CLI11 here when runtime CLI overrides are required.

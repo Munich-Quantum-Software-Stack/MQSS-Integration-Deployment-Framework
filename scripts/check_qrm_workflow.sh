@@ -24,11 +24,11 @@ cmake --build "${BUILD_DIR}"
 rm -rf "${INSTALL_DIR}"
 cmake --install "${BUILD_DIR}" --prefix "${INSTALL_DIR}"
 
-# rm -rf "${QRM_BUILD_DIR}"     // Indiscriminately removing build is not a good idea since all dependencies go inside it
+rm -rf "${QRM_BUILD_DIR}"     # Indiscriminately removing build is not a good idea since all dependencies go inside it (Keeping it for now)
+                                
 cmake -S examples/qrm_workflow -B "${QRM_BUILD_DIR}" \
-  -DCMAKE_PREFIX_PATH="${INSTALL_DIR}" \
-  -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++
-
+  -DCMAKE_PREFIX_PATH="${INSTALL_DIR}"
+  
 cmake --build "${QRM_BUILD_DIR}"
 
 if [[ "${RUN_WORKFLOW}" == "1" ]]; then

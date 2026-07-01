@@ -53,12 +53,18 @@ struct PathConfig {
   std::string qdmi_device_objs_dir;
 };
 
+struct QDMIDevices{
+  std::string qdmi_device_obj;
+  std::string qdmi_device_prefix;
+};
+
 struct Config {
   RabbitMqConfig rabbitmq;
   QueueConfig queues;
   LoggingConfig logging;
   ToolConfig tools;
   PathConfig paths;
+  QDMIDevices devices;
 };
 
 // Build a configuration from defaults and environment overrides.

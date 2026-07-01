@@ -19,7 +19,7 @@ find_package(Spdlog REQUIRED)
 include(Config.cmake)
 
 configure_file(
-  src/ConfigDefaults.hpp.in
+  ConfigDefaults.hpp.in
   ${CMAKE_CURRENT_BINARY_DIR}/generated/ConfigDefaults.hpp
   @ONLY
 )

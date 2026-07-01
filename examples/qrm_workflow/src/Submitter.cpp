@@ -1,4 +1,5 @@
-
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+// Copyright (c) MQSS Maintainers
 
 #include "Config.hpp"
 #include "Logger.hpp"
@@ -10,51 +11,17 @@
 #include <array>
 #include <cstdio>
 #include <cstdlib>
-#include <stdexcept>
 #include <string>
 #include <unistd.h>
-#include <unordered_map>
-// #include "qdmi/client.h"
-// #include "qdmi/constants.h"
-// #include "qdmi/device.h"
 #include "Driver.hpp"
-// #include "qdmi_example_driver.h"
-// #include "qdmi/constants.h"
-#include "qinfo.h"
 
-#include "gtest/gtest.h"
 #include <cassert>
-#include <complex>
 #include <csignal>
-#include <cstdint>
 #include <cstring>
-#include <filesystem>
-#include <fstream>
-#include <gtest/gtest.h>
-#include <iostream>
-#include <set>
 #include <string>
 #include <utility>
 #include <vector>
 
-
-static std::tuple<std::string, std::string> extractQDMIObj(std::string conf_path) {
-  std::ifstream conf(conf_path);
-  std::string line;
-
-  while (std::getline(conf, line)) {
-    // Skip empty lines and comments
-    if (line.empty() || line[0] == '#')
-      continue;
-
-    std::istringstream iss(line);
-    std::string path, prefix;
-
-    if (iss >> path >> prefix) {
-      return std::make_tuple(path, prefix);
-    }
-  }
-}
 
 // Load the device library dynamically
 static std::pair<std::reference_wrapper<qdmi_main_driver::Driver>, QDMI_Device>
@@ -100,11 +67,11 @@ addDynamicDeviceLibrary(const std::string &libName, const std::string &prefix) {
 //       queried.
 static mqss::QuantumResult
 createAndSubmitQDMIJobToQDMIDevice(mqss::QuantumTask task,
-                                   const std::string &device_conf_path) {
+                                   const std::string libName="", const std::string DevicePrefix="") {
 
-  auto [libName, prefix] = extractQDMIObj(device_conf_path);
+  // auto [libName, prefix] = extractQDMIObj(device_conf_path);
 
-  auto [driver_ref, dev] = addDynamicDeviceLibrary(libName, prefix);
+  auto [driver_ref, dev] = addDynamicDeviceLibrary(libName, DevicePrefix);
   QDMI_Job job = nullptr;
   int ret = 0;
 
@@ -162,8 +129,6 @@ createAndSubmitQDMIJobToQDMIDevice(mqss::QuantumTask task,
   size_t size = 0;
   ret = QDMI_job_get_results(job, QDMI_JOB_RESULT_HIST_KEYS, 0, nullptr, &size);
   assert(ret == QDMI_SUCCESS);
-  // const size_t vec_length = state_size / sizeof(double);
-  // assert(vec_length % 2 == 0);
 
   std::string key_list(size - 1, '\0');
   ret = QDMI_job_get_results(
@@ -210,7 +175,6 @@ createAndSubmitQDMIJobToQDMIDevice(mqss::QuantumTask task,
   }
 
   QDMI_job_free(job);
-  // QDMI_session_free(session);
   driver.sessionFree(session);
 
   return result;
@@ -242,7 +206,7 @@ mqss::examples::qrm_workflow::initConfig(
 
   // Poll for incoming tasks
   while (true) {
-    logger->info("Waiting for a new job...");
+    spdlog::info("Waiting for a new job...");
     auto res = messenger.receive<mqss::QuantumTask>(
         {config.queues.submitter}, mqss::ReceiveArgs{
                                .timeout = std::chrono::milliseconds(5000),
@@ -254,41 +218,37 @@ mqss::examples::qrm_workflow::initConfig(
       if (res.error().code() == mqss::StatusCode::Timeout) {
         continue;
       }
-      logger->error("Receive error: ", res.error().reason());
+      spdlog::error("Receive error: ", res.error().reason());
       continue;
     }
 
     mqss::QuantumTask &task = *res;
-    logger->info("Processing new task with id: {}", task.task_id());
+    spdlog::info("Processing new task with id: {}", task.task_id());
   
     // Debugging: Print Circuit files received (qasm or qir)...
-    // logger->info("-->Decoded task id: {}", task.task_id());
-    // logger->info("-->New Circuit files dump:\n");
+    // spdlog::info("-->Decoded task id: {}", task.task_id());
+    // spdlog::info("-->New Circuit files dump:\n");
     // auto decoded_circuits = task.circuit_files();
     // for (auto circuit : decoded_circuits) {
-    //   logger->info(circuit);
+    //   spdlog::info(circuit);
     // }
 
     // prepare QDMI job and submit
     // Set the path to the QDMI Device Shared Object file
 
-    std::string device_prefix = config.paths.qdmi_device_objs_dir + "/mqt_qdmi_ddsim.conf";
-    spdlog::info("Device conf is: " + device_prefix);
-
+    std::string libName =  config.paths.qdmi_device_objs_dir + "/" + config.devices.qdmi_device_obj;
+    std::string DevicePefix = config.devices.qdmi_device_prefix;
     auto circuit_result = createAndSubmitQDMIJobToQDMIDevice(
-        task, device_prefix);
-
-    // auto circuit_result =
-    //     createAndSubmitQDMIJob(task, device_conf.c_str(), std::move(logger));
+        task, libName, DevicePefix);
 
     auto send_st = messenger.send<mqss::QuantumResult>(
         {task.result_destination()}, // use the queue the daemon specified
         circuit_result);
 
     // After send
-    logger->info("Result sent by the Submitter for task: {}", task.task_id());
+    spdlog::info("Result sent by the Submitter for task: {}", task.task_id());
     if (!send_st.ok())
-      logger->error("Failed to send result: {}", send_st.reason());
+      spdlog::error("Failed to send result: {}", send_st.reason());
   }
 
   return 0;
