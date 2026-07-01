@@ -27,9 +27,5 @@ inline constexpr std::string_view cudaq_translate = "@QRM_CUDAQ_TRANSLATE@";
 
 inline constexpr std::string_view log_dir = "@QRM_LOG_DIR@";
 inline constexpr std::string_view benchmark_dir = "@QRM_BENCHMARK_DIR@";
-inline constexpr std::string_view qdmi_device_objs_dir = "@QRM_QDMI_DEVICES_DIR@";
-
-inline constexpr std::string_view qdmi_device_obj = "libmqt-core-qdmi-ddsim-device.so.3.3.4";
-inline constexpr std::string_view qdmi_device_prefix = "MQT_DDSIM";
 
 } // namespace mqss::examples::qrm_workflow::defaults
