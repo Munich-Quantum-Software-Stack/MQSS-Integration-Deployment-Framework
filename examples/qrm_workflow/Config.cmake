@@ -24,6 +24,9 @@ set(QRM_MQSS_CUDAQ_OPT
 set(QRM_LOG_DIR "${CMAKE_CURRENT_BINARY_DIR}/logs"
   CACHE PATH "Default log directory")
 
+set(QRM_QDMI_DEVICES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/qdmi_device_objs"
+  CACHE PATH "Default QDMI Devices directory")
+
 # Benchmarks
 set(QRM_BENCHMARK_DIR
     "${CMAKE_CURRENT_SOURCE_DIR}/benchmarks"

@@ -2,17 +2,19 @@
 # Copyright (c) MQSS Maintainers
 
 cmake_minimum_required(VERSION 3.28)
-project(qrm_workflow LANGUAGES CXX)
+project(qrm_workflow LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(mqss REQUIRED)
-find_package(spdlog CONFIG REQUIRED)
-
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 find_package(MQSSCI REQUIRED)
+find_package(qdmi REQUIRED)
+find_package(qinfo REQUIRED)
+find_package(Spdlog REQUIRED)
 
 include(Config.cmake)
 
@@ -22,12 +24,18 @@ configure_file(
   @ONLY
 )
 
+include_directories(
+  BEFORE
+  "${CMAKE_CURRENT_SOURCE_DIR}/include"
+  ${GTEST_INCLUDE_DIRS}
+)
+
 file(MAKE_DIRECTORY "${QRM_LOG_DIR}")
 
 function(add_qrm_workflow_executable target)
   add_executable(${target}
     ${ARGN}
-    Config.cpp
+    src/Config.cpp
   )
 
   target_include_directories(${target}
@@ -40,9 +48,14 @@ function(add_qrm_workflow_executable target)
     PRIVATE
       mqss::mqss
       spdlog::spdlog
+      qdmi::qdmi
+      # qdmi::example_driver
+      # qdmi::qdmi_project_warnings
+      qinfo
   )
 endfunction()
 
-add_qrm_workflow_executable(daemon Daemon.cpp)
-add_qrm_workflow_executable(scheduler Scheduler.cpp)
-add_qrm_workflow_executable(compiler Compiler.cpp)
+add_qrm_workflow_executable(daemon src/Daemon.cpp)
+add_qrm_workflow_executable(scheduler src/Scheduler.cpp)
+add_qrm_workflow_executable(compiler src/Compiler.cpp)
+add_qrm_workflow_executable(submitter src/Submitter.cpp src/Driver.cpp)

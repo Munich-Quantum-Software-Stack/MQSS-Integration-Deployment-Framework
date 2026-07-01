@@ -1,4 +1,5 @@
 build/
+examples/qrm_workflow/build
 .cache/
 docs/api/
 *~
