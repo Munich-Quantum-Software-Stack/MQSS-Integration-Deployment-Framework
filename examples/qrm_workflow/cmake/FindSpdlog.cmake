@@ -1,6 +1,0 @@
-# cmake/Findspdlog.cmake  (yours, overrides the broken one via module path precedence)
-if(TARGET spdlog::spdlog)
-  set(spdlog_FOUND TRUE)
-  return()
-endif()
-find_package(spdlog CONFIG QUIET)

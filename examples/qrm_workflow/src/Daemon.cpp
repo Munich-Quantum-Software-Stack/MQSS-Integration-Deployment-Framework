@@ -44,7 +44,7 @@ int main(int argc, char **argv) {
       ""); // Either iqm, fermioniq, ionq, oqc, quantinuum, qci
 
   auto circuit_file_path = std::filesystem::path(config.paths.benchmark_dir) /
-                           "bell_state.cpp";
+                           "bell_state.mlir";
 
   task.add_circuit_files(circuit_file_path);
   task.set_circuit_file_type("cpp");

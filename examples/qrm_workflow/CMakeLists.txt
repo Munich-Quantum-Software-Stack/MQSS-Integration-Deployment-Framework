@@ -14,8 +14,8 @@ find_package(mqss REQUIRED)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 
-find_package(Spdlog REQUIRED)   # system installed
 find_package(mqt-core REQUIRED)
+find_package(spdlog CONFIG REQUIRED)
 find_package(MQSSCI REQUIRED)
 find_package(qdmi REQUIRED)    # system by mqt-core
 find_package(qinfo REQUIRED)

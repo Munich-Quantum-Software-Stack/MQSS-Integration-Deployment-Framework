@@ -20,6 +20,21 @@
 #include <string>
 #include <vector>
 
+void PrintDeviceName(QDMI_Device device){
+  size_t namesSize = 0;
+  size_t ret = 0;
+  ret = QDMI_device_query_device_property(device, QDMI_DEVICE_PROPERTY_NAME, 0,
+                                          nullptr, &namesSize);
+
+  assert(ret == QDMI_SUCCESS);
+  std::string name(namesSize - 1, '\0');
+  ret = QDMI_device_query_device_property(device, QDMI_DEVICE_PROPERTY_NAME,
+                                          namesSize, name.data(), nullptr);
+
+  assert(ret == QDMI_SUCCESS);
+  spdlog::info("Device name: {} ", name);
+}
+
 // Use QDMI API's to create a QDMI Job and submit it to the QDMI device.
 // Note: QDMI_DEVICE_JOB_PARAMETER_SHOTSNUM is not set here. Therefore, the
 // Driver
@@ -53,6 +68,7 @@ createAndSubmitQDMIJobToQDMIDevice(mqss::QuantumTask task) {
   // Three devices are specified currently: MQT_NA, MQT_SC, MQT_DDSIM
   QDMI_Device device = devices.back(); // the vendor device i.e. MQT_DDSIM
 
+  PrintDeviceName(device);
   auto circuit = task.circuit_files()[0];
   ret = QDMI_device_create_job(device, &job);
   assert(ret == QDMI_SUCCESS);
