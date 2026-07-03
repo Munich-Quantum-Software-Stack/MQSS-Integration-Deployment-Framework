@@ -20,11 +20,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libboost-system-dev \
     doxygen \
     graphviz \
-    # \
-    # # Project examples
-    # libspdlog-dev \
-    # libfmt-dev \
-    # \
+    # Project examples
+    libspdlog-dev \
+    libfmt-dev \
+    \
     # MQSSCI dependencies
     curl \
     wget \
