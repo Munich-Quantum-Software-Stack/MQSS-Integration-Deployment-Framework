@@ -8,41 +8,19 @@
 #include "mqss/Protocol.hpp"
 #include "mqss/Transport.hpp"
 
-#include <array>
+#include "qdmi/client.h"
 #include <cstdio>
 #include <cstdlib>
 #include <string>
 #include <unistd.h>
-#include "Driver.hpp"
 
 #include <cassert>
 #include <csignal>
 #include <cstring>
 #include <string>
-#include <utility>
 #include <vector>
 
-
-// Load the device library dynamically
-static std::pair<std::reference_wrapper<qdmi_main_driver::Driver>, QDMI_Device>
-addDynamicDeviceLibrary(const std::string &libName, const std::string &prefix) {
-
-  qdmi_main_driver::DeviceSessionConfig config;
-  // If connecting to a remote device, use:
-  // config.baseUrl = "http://localhost:8080";
-  // config.token = "test_token";
-  // config.authUrl = "https://auth.example.com";
-  // config.username = "user";
-  // config.password = "pass";
-  // config.custom1 = "value1";
-  // config.custom2 = "value2";
-  // config.custom3 = "value3";
-  // config.custom4 = "value4";
-  // config.custom5 = "value5";
-
-  auto &driver = qdmi_main_driver::Driver::get();
-
-  auto *device = driver.addDynamicDeviceLibrary(libName, prefix, config);
+void PrintDeviceName(QDMI_Device device){
   size_t namesSize = 0;
   size_t ret = 0;
   ret = QDMI_device_query_device_property(device, QDMI_DEVICE_PROPERTY_NAME, 0,
@@ -55,32 +33,44 @@ addDynamicDeviceLibrary(const std::string &libName, const std::string &prefix) {
 
   assert(ret == QDMI_SUCCESS);
   spdlog::info("Device name: {} ", name);
-  return std::make_pair(std::ref(driver), device);
 }
 
 // Use QDMI API's to create a QDMI Job and submit it to the QDMI device.
-// Note: QDMI_DEVICE_JOB_PARAMETER_SHOTSNUM is not set here. Therefore, the Driver
-//       internally uses its default value i.e. 2. This means that "weak simulation"
-//       is selected i.e. sampling from the distribution produced by the circuit. Therefore,
-//       Histogram results are queried from the QDMI device. If QDMI_DEVICE_JOB_PARAMETER_SHOTSNUM
-//       is set to 0, strong simulation is selected and then full state vector results can be
+// Note: QDMI_DEVICE_JOB_PARAMETER_SHOTSNUM is not set here. Therefore, the
+// Driver
+//       internally uses its default value i.e. 2. This means that "weak
+//       simulation" is selected i.e. sampling from the distribution produced by
+//       the circuit. Therefore, Histogram results are queried from the QDMI
+//       device. If QDMI_DEVICE_JOB_PARAMETER_SHOTSNUM is set to 0, strong
+//       simulation is selected and then full state vector results can be
 //       queried.
 static mqss::QuantumResult
-createAndSubmitQDMIJobToQDMIDevice(mqss::QuantumTask task,
-                                   const std::string libName="", const std::string DevicePrefix="") {
+createAndSubmitQDMIJobToQDMIDevice(mqss::QuantumTask task) {
 
-  // auto [libName, prefix] = extractQDMIObj(device_conf_path);
-
-  auto [driver_ref, dev] = addDynamicDeviceLibrary(libName, DevicePrefix);
   QDMI_Job job = nullptr;
   int ret = 0;
 
-  qdmi_main_driver::Driver &driver = driver_ref.get();
+  // qdmi_main_driver::Driver &driver = driver_ref.get();
   QDMI_Session session = nullptr;
-  driver.sessionAlloc(&session);
+  // driver.sessionAlloc(&session);
+  // session -> enumerate devices (driver has already dlopen'd them, incl.
+  // libdevice_x.so)
+  QDMI_session_alloc(&session);
+  QDMI_session_init(session);
 
+  size_t size = 0;
+  QDMI_session_query_session_property(session, QDMI_SESSION_PROPERTY_DEVICES, 0,
+                                      nullptr, &size);
+  std::vector<QDMI_Device> devices(size / sizeof(QDMI_Device));
+  QDMI_session_query_session_property(session, QDMI_SESSION_PROPERTY_DEVICES,
+                                      size, devices.data(), nullptr);
+
+  // Three devices are specified currently: MQT_NA, MQT_SC, MQT_DDSIM
+  QDMI_Device device = devices.back(); // the vendor device i.e. MQT_DDSIM
+
+  PrintDeviceName(device);
   auto circuit = task.circuit_files()[0];
-  ret = QDMI_device_create_job(dev, &job);
+  ret = QDMI_device_create_job(device, &job);
   assert(ret == QDMI_SUCCESS);
 
   spdlog::info("Created QDMI Job...");
@@ -126,13 +116,14 @@ createAndSubmitQDMIJobToQDMIDevice(mqss::QuantumTask task,
   assert(ret == QDMI_SUCCESS);
 
   // Teardown (in reverse order)
-  size_t size = 0;
-  ret = QDMI_job_get_results(job, QDMI_JOB_RESULT_HIST_KEYS, 0, nullptr, &size);
+  size_t result_size = 0;
+  ret = QDMI_job_get_results(job, QDMI_JOB_RESULT_HIST_KEYS, 0, nullptr,
+                             &result_size);
   assert(ret == QDMI_SUCCESS);
 
-  std::string key_list(size - 1, '\0');
+  std::string key_list(result_size - 1, '\0');
   ret = QDMI_job_get_results(
-      job, QDMI_JOB_RESULT_HIST_KEYS, size,
+      job, QDMI_JOB_RESULT_HIST_KEYS, result_size,
       static_cast<void *>(const_cast<char *>(key_list.data())), nullptr);
 
   assert(ret == QDMI_STATUS::QDMI_SUCCESS);
@@ -175,14 +166,14 @@ createAndSubmitQDMIJobToQDMIDevice(mqss::QuantumTask task,
   }
 
   QDMI_job_free(job);
-  driver.sessionFree(session);
+  QDMI_session_free(session);
 
   return result;
 }
 
 int main(int argc, char **argv) {
 
-mqss::examples::qrm_workflow::initConfig(
+  mqss::examples::qrm_workflow::initConfig(
       mqss::examples::qrm_workflow::loadConfig(argc, argv));
 
   auto config = mqss::examples::qrm_workflow::getConfig();
@@ -201,17 +192,17 @@ mqss::examples::qrm_workflow::initConfig(
   opts.username = std::string(config.rabbitmq.user);
   opts.password = std::string(config.rabbitmq.password);
 
-
   mqss::Messenger<mqss::RabbitMqSimple, mqss::ProtoJson> messenger(opts);
 
   // Poll for incoming tasks
   while (true) {
     spdlog::info("Waiting for a new job...");
     auto res = messenger.receive<mqss::QuantumTask>(
-        {config.queues.submitter}, mqss::ReceiveArgs{
-                               .timeout = std::chrono::milliseconds(5000),
-                               .ack_mode = mqss::AckMode::Auto,
-                           });
+        {config.queues.submitter},
+        mqss::ReceiveArgs{
+            .timeout = std::chrono::milliseconds(5000),
+            .ack_mode = mqss::AckMode::Auto,
+        });
 
     if (!res.has_value()) {
       // Timeout is normal — just keep polling
@@ -224,7 +215,7 @@ mqss::examples::qrm_workflow::initConfig(
 
     mqss::QuantumTask &task = *res;
     spdlog::info("Processing new task with id: {}", task.task_id());
-  
+
     // Debugging: Print Circuit files received (qasm or qir)...
     // spdlog::info("-->Decoded task id: {}", task.task_id());
     // spdlog::info("-->New Circuit files dump:\n");
@@ -236,10 +227,7 @@ mqss::examples::qrm_workflow::initConfig(
     // prepare QDMI job and submit
     // Set the path to the QDMI Device Shared Object file
 
-    std::string libName =  config.paths.qdmi_device_objs_dir + "/" + config.devices.qdmi_device_obj;
-    std::string DevicePefix = config.devices.qdmi_device_prefix;
-    auto circuit_result = createAndSubmitQDMIJobToQDMIDevice(
-        task, libName, DevicePefix);
+    auto circuit_result = createAndSubmitQDMIJobToQDMIDevice(task);
 
     auto send_st = messenger.send<mqss::QuantumResult>(
         {task.result_destination()}, // use the queue the daemon specified

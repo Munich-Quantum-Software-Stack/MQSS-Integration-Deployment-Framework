@@ -16,26 +16,26 @@
 #include <unistd.h>
 #include <unordered_map>
 
-std::string stripSpuriousGateDefs(const std::string& qasm) {
-    std::istringstream stream(qasm);
-    std::ostringstream result;
-    std::string line;
-    bool inGateBlock = false;
-    while (std::getline(stream, line)) {
-        if (line.find("gate ") != std::string::npos && 
-            line.find("{") != std::string::npos) {
-            inGateBlock = true;
-            continue;
-        }
-        if (inGateBlock) {
-            if (line.find("}") != std::string::npos) {
-                inGateBlock = false;
-            }
-            continue;
-        }
-        result << line << "\n";
+std::string stripSpuriousGateDefs(const std::string &qasm) {
+  std::istringstream stream(qasm);
+  std::ostringstream result;
+  std::string line;
+  bool inGateBlock = false;
+  while (std::getline(stream, line)) {
+    if (line.find("gate ") != std::string::npos &&
+        line.find("{") != std::string::npos) {
+      inGateBlock = true;
+      continue;
     }
-    return result.str();
+    if (inGateBlock) {
+      if (line.find("}") != std::string::npos) {
+        inGateBlock = false;
+      }
+      continue;
+    }
+    result << line << "\n";
+  }
+  return result.str();
 }
 
 // Invokes cudaq-quake on `src_path` which convert the source to quake mlir
@@ -43,10 +43,10 @@ std::string stripSpuriousGateDefs(const std::string& qasm) {
 // dialect Finally, cudaq-translate is called to translate the output to qasm or
 // qir. Returns the raw Quake MLIR as a string. result_type can be "qir",
 // "qir-full", "qir-adaptive", "qir-base", "openqasm2"
-static std::string
-lowerToOutputFormat(const std::string &src_path, int opt_level,
-                    const std::string &target_qpu,
-                    const std::string &result_type) {
+static std::string lowerToOutputFormat(const std::string &src_path,
+                                       int opt_level,
+                                       const std::string &target_qpu,
+                                       const std::string &result_type) {
 
   // Write output to a temp file
   char tmp_path[] = "/tmp/mqss_quake_XXXXXX";
@@ -71,11 +71,10 @@ lowerToOutputFormat(const std::string &src_path, int opt_level,
   auto tools = mqss::examples::qrm_workflow::getConfig().tools;
 
   const std::string cmd =
-      std::string(tools.cudaq_quake) + " " + src_path + " | " +
       std::string(tools.mqss_cudaq_opt) + " --O" + std::to_string(opt_level) +
-      " | " + std::string(tools.cudaq_opt) + " " + decomposition_cmd + " | " +
-      std::string(tools.cudaq_translate) + " --convert-to=" + result_type +
-      " -o " + tmp_path;
+      " " + src_path + " | " + std::string(tools.cudaq_opt) + " " +
+      decomposition_cmd + " | " + std::string(tools.cudaq_translate) +
+      " --convert-to=" + result_type + " -o " + tmp_path;
 
   spdlog::info("Shell command: {}", cmd);
 
@@ -117,8 +116,9 @@ static void applyOptimizationPasses(mqss::QuantumTask &task) {
     // Final argument to lowerToOutputFormat can be set to:
     // "qir", "qir-full", "qir-adaptive", "qir-base", "openqasm2"
     std::string result_type = "openqasm2";
-    auto out_res = lowerToOutputFormat(circuit_file, opt_level, qpu, result_type);
-    if(result_type == "openqasm2"){
+    auto out_res =
+        lowerToOutputFormat(circuit_file, opt_level, qpu, result_type);
+    if (result_type == "openqasm2") {
       out_res = stripSpuriousGateDefs(out_res);
     }
 
@@ -184,11 +184,11 @@ int main(int argc, char **argv) {
     }
 
     spdlog::info("-->Compiler output:");
-    for(auto c : task.circuit_files()){
+    for (auto c : task.circuit_files()) {
       spdlog::info(c);
     }
 
-   auto send_st = messenger.send<mqss::QuantumTask>(
+    auto send_st = messenger.send<mqss::QuantumTask>(
         {std::string(config.queues.submitter)}, task);
 
     spdlog::info("Task sent by compiler!");
