@@ -10,6 +10,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(mqss REQUIRED)
+find_package(spdlog REQUIRED)
 
 include(Config.cmake)
 
@@ -29,7 +30,7 @@ target_include_directories(
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/generated>
 )
 
-target_link_libraries(qoffload-core INTERFACE mqss::mqss)
+target_link_libraries(qoffload-core INTERFACE mqss::mqss spdlog::spdlog)
 
 target_compile_options(
   qoffload-core

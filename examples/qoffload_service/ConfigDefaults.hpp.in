@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
 #include <string_view>
 
@@ -37,6 +38,15 @@ inline constexpr std::uint64_t instance_uid = 0;
 inline constexpr std::string_view user_identity = "qoffload_user";
 inline constexpr bool hpc_node = false;
 inline constexpr bool resume_state = false;
+
+// Logging.
+inline constexpr bool log_enabled = true;
+inline constexpr bool log_console_enabled = true;
+inline constexpr bool log_file_enabled = false;
+inline constexpr std::string_view log_level = "info";
+inline constexpr std::string_view log_file_mode = "rotate";
+inline constexpr std::size_t log_rotation_size = 10U * 1024U * 1024U;
+inline constexpr std::size_t log_rotation_files = 3;
 
 // Dynamic build-time paths.
 inline constexpr std::string_view runtime_dir = "@QOFFLOAD_RUNTIME_DIR@";

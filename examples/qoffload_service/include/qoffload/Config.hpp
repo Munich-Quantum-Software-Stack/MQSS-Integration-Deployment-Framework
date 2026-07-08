@@ -10,9 +10,12 @@
 #include "mqss/Config.hpp"
 #include "mqss/Status.hpp"
 
+#include <cstddef>
 #include <cstdint>
+#include <filesystem>
 #include <functional>
 #include <string>
+#include <string_view>
 #include <utility>
 
 namespace qoffload {
@@ -43,6 +46,23 @@ struct IdentityConfig {
   std::string user_identity;
 };
 
+/// Logging severity threshold.
+enum class LogLevel { Trace, Debug, Info, Warning, Error, Critical, Off };
+
+/// File logging behavior.
+enum class LogFileMode { Append, Truncate, Rotate };
+
+/// Logging output and file-rotation settings.
+struct LoggingConfig {
+  bool enabled;
+  bool console_enabled;
+  bool file_enabled;
+  LogLevel level;
+  LogFileMode file_mode;
+  std::size_t rotation_size;
+  std::size_t rotation_files;
+};
+
 /// Runtime paths used by QOffload.
 struct PathConfig {
   std::string runtime_dir;
@@ -56,12 +76,41 @@ struct PolicyConfig {
   bool resume_state{};
 };
 
+/// Converts the generated log-level default to its typed representation.
+constexpr LogLevel defaultLogLevel(std::string_view value) {
+  if (value == "trace")
+    return LogLevel::Trace;
+  if (value == "debug")
+    return LogLevel::Debug;
+  if (value == "warning" || value == "warn")
+    return LogLevel::Warning;
+  if (value == "error")
+    return LogLevel::Error;
+  if (value == "critical")
+    return LogLevel::Critical;
+  if (value == "off")
+    return LogLevel::Off;
+
+  return LogLevel::Info;
+}
+
+/// Converts the generated file-mode default to its typed representation.
+constexpr LogFileMode defaultLogFileMode(std::string_view value) {
+  if (value == "append")
+    return LogFileMode::Append;
+  if (value == "truncate")
+    return LogFileMode::Truncate;
+
+  return LogFileMode::Rotate;
+}
+
 /// Complete process configuration.
 struct Config {
   RabbitMqConfig rabbitmq;
   RabbitMqConfig qrm_rabbitmq;
   QueueConfig queues;
   IdentityConfig identity;
+  LoggingConfig logging;
   PathConfig paths;
   PolicyConfig policy;
 };
@@ -97,6 +146,16 @@ inline Config makeDefaultConfig(ConfigTag) {
               .instance_uid = defaults::instance_uid,
               .user_identity = std::string(defaults::user_identity),
           },
+      .logging =
+          {
+              .enabled = defaults::log_enabled,
+              .console_enabled = defaults::log_console_enabled,
+              .file_enabled = defaults::log_file_enabled,
+              .level = defaultLogLevel(defaults::log_level),
+              .file_mode = defaultLogFileMode(defaults::log_file_mode),
+              .rotation_size = defaults::log_rotation_size,
+              .rotation_files = defaults::log_rotation_files,
+          },
       .paths =
           {
               .runtime_dir = std::string(defaults::runtime_dir),
@@ -109,6 +168,46 @@ inline Config makeDefaultConfig(ConfigTag) {
               .resume_state = defaults::resume_state,
           },
   };
+}
+
+/// Parses a configured log level.
+inline mqss::Result<LogLevel> parseLogLevel(std::string_view value) {
+  if (value == "trace")
+    return LogLevel::Trace;
+  if (value == "debug")
+    return LogLevel::Debug;
+  if (value == "info")
+    return LogLevel::Info;
+  if (value == "warning" || value == "warn")
+    return LogLevel::Warning;
+  if (value == "error")
+    return LogLevel::Error;
+  if (value == "critical")
+    return LogLevel::Critical;
+  if (value == "off")
+    return LogLevel::Off;
+
+  return std::unexpected(
+      mqss::Status::configuration("Invalid value for QOFFLOAD_LOG_LEVEL"));
+}
+
+/// Parses a configured file logging mode.
+inline mqss::Result<LogFileMode> parseLogFileMode(std::string_view value) {
+  if (value == "append")
+    return LogFileMode::Append;
+  if (value == "truncate")
+    return LogFileMode::Truncate;
+  if (value == "rotate")
+    return LogFileMode::Rotate;
+
+  return std::unexpected(
+      mqss::Status::configuration("Invalid value for QOFFLOAD_LOG_FILE_MODE"));
+}
+
+/// Builds a log file path from a directory and file name.
+inline std::string logPath(std::string_view log_dir,
+                           std::string_view file_name) {
+  return (std::filesystem::path(log_dir) / file_name).string();
 }
 
 /// Applies QOffload environment-variable overrides.
@@ -162,6 +261,51 @@ inline mqss::Status applyEnvironment(ConfigTag, Config &config) {
   }
   config.identity.user_identity = mqss::config::getEnvOr(
       {"QOFFLOAD_USER_IDENTITY"}, config.identity.user_identity);
+
+  if (auto value = mqss::config::getEnvOr({"QOFFLOAD_LOG_ENABLED"},
+                                          config.logging.enabled)) {
+    config.logging.enabled = *value;
+  } else {
+    return value.error();
+  }
+  if (auto value = mqss::config::getEnvOr({"QOFFLOAD_LOG_CONSOLE_ENABLED"},
+                                          config.logging.console_enabled)) {
+    config.logging.console_enabled = *value;
+  } else {
+    return value.error();
+  }
+  if (auto value = mqss::config::getEnvOr({"QOFFLOAD_LOG_FILE_ENABLED"},
+                                          config.logging.file_enabled)) {
+    config.logging.file_enabled = *value;
+  } else {
+    return value.error();
+  }
+  if (const char *value = mqss::config::getEnv({"QOFFLOAD_LOG_LEVEL"})) {
+    if (auto level = parseLogLevel(value)) {
+      config.logging.level = *level;
+    } else {
+      return level.error();
+    }
+  }
+  if (const char *value = mqss::config::getEnv({"QOFFLOAD_LOG_FILE_MODE"})) {
+    if (auto mode = parseLogFileMode(value)) {
+      config.logging.file_mode = *mode;
+    } else {
+      return mode.error();
+    }
+  }
+  if (auto value = mqss::config::getEnvOr<std::size_t>(
+          {"QOFFLOAD_LOG_ROTATION_SIZE"}, config.logging.rotation_size)) {
+    config.logging.rotation_size = *value;
+  } else {
+    return value.error();
+  }
+  if (auto value = mqss::config::getEnvOr<std::size_t>(
+          {"QOFFLOAD_LOG_ROTATION_FILES"}, config.logging.rotation_files)) {
+    config.logging.rotation_files = *value;
+  } else {
+    return value.error();
+  }
 
   config.paths.runtime_dir = mqss::config::getEnvOr({"QOFFLOAD_RUNTIME_DIR"},
                                                     config.paths.runtime_dir);
