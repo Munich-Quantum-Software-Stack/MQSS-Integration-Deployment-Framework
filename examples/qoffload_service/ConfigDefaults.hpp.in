@@ -1,0 +1,46 @@
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+// Copyright (c) MQSS Maintainers
+
+#pragma once
+
+#include <cstdint>
+#include <string_view>
+
+namespace qoffload::defaults {
+
+// QOffload-facing RabbitMQ connection.
+inline constexpr std::string_view amqp_host = "localhost";
+inline constexpr int amqp_port = 5672;
+inline constexpr std::string_view amqp_user = "guest";
+inline constexpr std::string_view amqp_password = "guest";
+inline constexpr std::string_view amqp_vhost = "/";
+
+// QRM-facing RabbitMQ connection.
+inline constexpr std::string_view qrm_amqp_host = "127.0.0.1";
+inline constexpr int qrm_amqp_port = 5672;
+inline constexpr std::string_view qrm_amqp_user = "guest";
+inline constexpr std::string_view qrm_amqp_password = "guest";
+inline constexpr std::string_view qrm_amqp_vhost = "/";
+
+// Message queues.
+inline constexpr std::string_view request_queue =
+    "qoffload_request_reception_queue";
+inline constexpr std::string_view control_request_queue =
+    "qoffload_api_request_reception_queue";
+inline constexpr std::string_view result_queue =
+    "qoffload_result_reception_queue";
+inline constexpr std::string_view qrm_task_queue =
+    "quantum_task_collection_queue";
+
+// Identity and policy.
+inline constexpr std::uint64_t instance_uid = 0;
+inline constexpr std::string_view user_identity = "qoffload_user";
+inline constexpr bool hpc_node = false;
+inline constexpr bool resume_state = false;
+
+// Dynamic build-time paths.
+inline constexpr std::string_view runtime_dir = "@QOFFLOAD_RUNTIME_DIR@";
+inline constexpr std::string_view log_dir = "@QOFFLOAD_LOG_DIR@";
+inline constexpr std::string_view state_file = "@QOFFLOAD_STATE_FILE@";
+
+} // namespace qoffload::defaults

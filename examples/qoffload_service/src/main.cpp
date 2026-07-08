@@ -4,11 +4,27 @@
 /// \file
 /// Entry point for the QOffload service.
 ///
-/// Creates the top-level QOffload component.
+/// Initializes the process configuration and creates the top-level QOffload
+/// component.
 
+#include "qoffload/Config.hpp"
 #include "qoffload/QOffload.hpp"
 
-int main() {
+#include <iostream>
+#include <utility>
+
+int main(int argc, char **argv) {
+  auto config = qoffload::loadConfig(argc, argv);
+  if (!config) {
+    std::cerr << config.error().reason() << '\n';
+    return 1;
+  }
+
+  if (auto status = qoffload::initConfig(std::move(*config)); !status.ok()) {
+    std::cerr << status.reason() << '\n';
+    return 1;
+  }
+
   qoffload::QOffload qoffload{};
   qoffload.start();
 

@@ -11,6 +11,14 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(mqss REQUIRED)
 
+include(Config.cmake)
+
+configure_file(
+  ConfigDefaults.hpp.in
+  ${CMAKE_CURRENT_BINARY_DIR}/generated/ConfigDefaults.hpp
+  @ONLY
+)
+
 add_library(qoffload-core INTERFACE)
 add_library(qoffload::core ALIAS qoffload-core)
 
@@ -18,6 +26,7 @@ target_include_directories(
   qoffload-core
   INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/generated>
 )
 
 target_link_libraries(qoffload-core INTERFACE mqss::mqss)
