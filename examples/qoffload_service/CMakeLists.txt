@@ -11,6 +11,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(mqss REQUIRED)
 find_package(spdlog REQUIRED)
+find_package(Threads REQUIRED)
 
 include(Config.cmake)
 
@@ -20,21 +21,34 @@ configure_file(
   @ONLY
 )
 
-add_library(qoffload-core INTERFACE)
+add_library(
+  qoffload-core
+  src/Control.cpp
+  src/Forward.cpp
+  src/QOffload.cpp
+  src/TaskStore.cpp
+  src/control/ControlProtocol.cpp
+)
 add_library(qoffload::core ALIAS qoffload-core)
 
 target_include_directories(
   qoffload-core
-  INTERFACE
+  PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/generated>
 )
 
-target_link_libraries(qoffload-core INTERFACE mqss::mqss spdlog::spdlog)
+target_link_libraries(
+  qoffload-core
+  PUBLIC
+    mqss::mqss
+    spdlog::spdlog
+    Threads::Threads
+)
 
 target_compile_options(
   qoffload-core
-  INTERFACE
+  PUBLIC
     -Wall
     -Wextra
     -Wpedantic
@@ -42,3 +56,9 @@ target_compile_options(
 
 add_executable(qoffload src/main.cpp)
 target_link_libraries(qoffload PRIVATE qoffload::core)
+
+include(CTest)
+
+if(BUILD_TESTING)
+  add_subdirectory(tests)
+endif()
