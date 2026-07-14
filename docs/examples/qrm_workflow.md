@@ -75,7 +75,7 @@ Start the workflow:
 ./start.sh
 ```
 
-The script launches the daemon, scheduler, and compiler processes and terminates them when interrupted.
+The script launches the daemon, scheduler, submitter, compiler processes and terminates them when interrupted.
 
 ## Automated Check
 
