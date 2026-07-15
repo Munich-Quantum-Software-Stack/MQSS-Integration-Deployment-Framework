@@ -7,11 +7,15 @@ Communication between the components is performed through RabbitMQ using MQSS me
 ## Workflow
 
 ```text
-Daemon -> Scheduler -> Compiler -> Daemon
+Daemon -> Scheduler -> Compiler -> Submitter -> Simulator -> Submitter -> Daemon
 ```
 
 The daemon creates a `QuantumTask` and submits it to the scheduler.
-The scheduler forwards the task to the compiler. The compiler processes the task and returns the result to the daemon.
+The scheduler forwards the task to the compiler. The compiler processes the task, converts to
+an appropriate exchange format (OpenQasm2) which it then forwards to the Submitter. the Submitter
+creates a QDMI job using the QDMI client APIs and submits the job to a QDMI device for execution.
+Currently as an example, [MQT Core's DDSIM QDMI device](https://mqt.readthedocs.io/projects/ddsim/en/latest/) is used to simulate the circuit and generate
+results. The generated results are sent back to the Submitter which returns the results to the Daemon.
 
 ## Configuration
 
@@ -38,12 +42,14 @@ Log files are written to the configured log directory.
 
 ## Benchmarks
 
-Example benchmark circuits are provided in:
+Example benchmark circuits (in MLIR dialect representation) are provided in:
 
 ```text
 benchmarks/
 ```
 
+Note: The ```bell_state.mlir``` example is used for demonstration purposes.
+Path to this circuit is hard-coded within the Daemon.
 ## RabbitMQ Setup
 
 RabbitMQ installation and configuration are described in:
@@ -69,7 +75,7 @@ Start the workflow:
 ./start.sh
 ```
 
-The script launches the daemon, scheduler, and compiler processes and terminates them when interrupted.
+The script launches the daemon, scheduler, submitter, compiler processes and terminates them when interrupted.
 
 ## Automated Check
 
