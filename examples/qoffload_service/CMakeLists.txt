@@ -27,7 +27,8 @@ add_library(
   src/Forward.cpp
   src/QOffload.cpp
   src/TaskStore.cpp
-  src/control/ControlProtocol.cpp
+  src/control/RestControlProtocol.cpp
+  src/control/TypedControlProtocol.cpp
 )
 add_library(qoffload::core ALIAS qoffload-core)
 

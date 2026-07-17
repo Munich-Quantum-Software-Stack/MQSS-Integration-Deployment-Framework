@@ -6,6 +6,7 @@ find_package(GTest REQUIRED)
 add_executable(
   qoffload-unit-tests
   Sanity.cpp
+  RestControlProtocol.cpp
 )
 
 target_include_directories(

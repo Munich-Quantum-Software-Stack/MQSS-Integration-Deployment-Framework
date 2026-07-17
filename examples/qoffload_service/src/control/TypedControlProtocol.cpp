@@ -55,7 +55,7 @@ void setTaskResult(mqss::TaskResultResponse &response,
 } // namespace
 
 DecodedControlRequest
-ControlProtocol::decode(const mqss::APIRequest &request) const {
+TypedControlProtocol::decode(const mqss::APIRequest &request) const {
   DecodedControlRequest decoded{
       .command = invalid(InvalidControlRequest),
       .response_queue = request.response_queue(),
@@ -97,8 +97,9 @@ ControlProtocol::decode(const mqss::APIRequest &request) const {
   return decoded;
 }
 
-mqss::APIResponse ControlProtocol::encode(const ControlResult &result,
-                                          std::string destination_queue) const {
+mqss::APIResponse
+TypedControlProtocol::encode(const ControlResult &result,
+                             std::string destination_queue) const {
   mqss::APIResponse response;
   response.set_destination_queue(std::move(destination_queue));
 

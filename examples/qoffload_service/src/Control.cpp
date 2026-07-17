@@ -143,7 +143,7 @@ ControlMessageOutcome Control::process(const mqss::APIRequest &request,
                                        TaskStore &tasks, const Config &config,
                                        const ResourceRegistry &resources,
                                        Forward &forwarder) const {
-  const protocol::ControlProtocol protocol;
+  const auto &protocol = protocol::controlProtocolFor(request);
   auto decoded = protocol.decode(request);
   auto outcome = executeControlCommand(decoded.command, tasks, config,
                                        resources, forwarder);

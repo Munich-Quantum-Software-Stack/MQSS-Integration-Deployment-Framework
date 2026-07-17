@@ -88,13 +88,48 @@ struct DecodedControlRequest {
   std::string response_queue;
 };
 
-/// Decoder and encoder for the typed APIRequest/APIResponse Control protocol.
+/// Private adapter interface shared by all control protocols.
 class ControlProtocol {
 public:
-  DecodedControlRequest decode(const mqss::APIRequest &request) const;
+  virtual ~ControlProtocol() = default;
 
-  mqss::APIResponse encode(const ControlResult &result,
-                           std::string destination_queue) const;
+  virtual DecodedControlRequest
+  decode(const mqss::APIRequest &request) const = 0;
+  virtual mqss::APIResponse encode(const ControlResult &result,
+                                   std::string destination_queue) const = 0;
 };
+
+/// Adapter for the fully typed protobuf control protocol.
+class TypedControlProtocol final : public ControlProtocol {
+public:
+  DecodedControlRequest decode(const mqss::APIRequest &request) const override;
+  mqss::APIResponse encode(const ControlResult &result,
+                           std::string destination_queue) const override;
+};
+
+/// Adapter for the REST-like control protocol.
+///
+/// Responses are returned in APIResponse.response_body. Unlike the Python
+/// implementation, the full APIResponse is serialized instead of only the
+/// response body.
+class RestControlProtocol final : public ControlProtocol {
+public:
+  DecodedControlRequest decode(const mqss::APIRequest &request) const override;
+  mqss::APIResponse encode(const ControlResult &result,
+                           std::string destination_queue) const override;
+};
+
+/// Selects the protocol once so the same adapter decodes the request and
+/// encodes its response.
+inline const ControlProtocol &
+controlProtocolFor(const mqss::APIRequest &request) noexcept {
+  static const TypedControlProtocol typed_protocol;
+  static const RestControlProtocol rest_protocol;
+
+  if (request.typed_request_case() != mqss::APIRequest::TYPED_REQUEST_NOT_SET) {
+    return typed_protocol;
+  }
+  return rest_protocol;
+}
 
 } // namespace qoffload::protocol
