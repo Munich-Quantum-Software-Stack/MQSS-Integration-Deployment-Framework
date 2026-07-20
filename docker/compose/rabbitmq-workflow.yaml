@@ -28,6 +28,7 @@ services:
     # Make RabbitMQ reachable as "rabbitmq".
     environment:
       QRM_AMQP_HOST: rabbitmq
+      QOFFLOAD_AMQP_HOST: rabbitmq
 
     stdin_open: true
     tty: true
