@@ -261,3 +261,182 @@ message QResourceInfo {
   // Python implementation: Optional[str].
   string instructions = 4;
 }
+
+// Typed payload for creating a quantum task through the API interface.
+//
+// Mirrors the payload used by the Python "job" POST operation while giving
+// the typed protocol an explicit operation-specific request message.
+message CreateTaskRequest {
+  // Number of execution shots.
+  int32 shots = 1;
+
+  // Circuit file references.
+  repeated string circuit = 2;
+
+  // Circuit file format/type.
+  string circuit_format = 3;
+
+  // Preferred resource/backend name.
+  string resource_name = 4;
+
+  // If true, modifications to the task/circuit should be avoided.
+  bool no_modify = 5;
+}
+
+// Typed request for an operation addressing an existing task.
+message TaskRequest {
+  // Task identifier returned by the create-task operation.
+  int32 uuid = 1;
+}
+
+// Typed request for an operation addressing a resource.
+message ResourceRequest {
+  // Resource/backend name.
+  string resource_name = 1;
+}
+
+// Typed request for listing available resources.
+message ListResourcesRequest {}
+
+// Status of a task managed through the API interface.
+enum ApiTaskStatus {
+  API_TASK_STATUS_UNSPECIFIED = 0;
+  API_TASK_STATUS_WAITING = 1;
+  API_TASK_STATUS_COMPLETED = 2;
+  API_TASK_STATUS_CANCELLED = 3;
+}
+
+// Typed response returned after creating a task.
+message CreateTaskResponse {
+  // Identifier assigned to the created task.
+  int32 uuid = 1;
+}
+
+// Typed response returned for a task-status query.
+message TaskStatusResponse {
+  // Current task status.
+  ApiTaskStatus status = 1;
+}
+
+// Typed response returned for a task-result query.
+message TaskResultResponse {
+  // Measurement results.
+  repeated CircuitResult result = 1;
+
+  // Submission timestamp.
+  string timestamp_submitted = 2;
+
+  // Scheduling timestamp.
+  string timestamp_scheduled = 3;
+
+  // Completion timestamp.
+  string timestamp_completed = 4;
+}
+
+// Typed response returned for a cancellation-reason query.
+message CancelReasonResponse {
+  // Human-readable cancellation reason.
+  string cancel_reason = 1;
+}
+
+// Typed response returned for a resource-list query.
+message ResourcesResponse {
+  // Available resource names.
+  repeated string resources = 1;
+}
+
+// Typed response returned for a resource-information query.
+message ResourceInfoResponse {
+  // Resource/backend name.
+  string name = 1;
+
+  // Number of qubits provided by the resource.
+  int32 num_qubits = 2;
+
+  // Indicates whether the resource is currently available.
+  bool online = 3;
+}
+
+// Typed response returned for a pending-job query.
+message PendingTasksResponse {
+  // Number of pending jobs, matching the current Python API name.
+  int32 num_pending_jobs = 1;
+}
+
+// Typed error response.
+//
+// The Python implementation does not define stable error codes. The message
+// is therefore diagnostic; clients should use the selected oneof case to
+// identify an error.
+message ErrorResponse {
+  string message = 1;
+}
+
+// API request envelope shared by two protocols.
+//
+// The typed protocol selects an operation through typed_request and ignores
+// method, request, and data. The REST-like compatibility protocol uses those
+// fields instead.
+//
+// Request/response flow: APIRequest -> APIResponse
+message APIRequest {
+  // Authorization information, such as a token or credential string.
+  string authorization = 1;
+
+  // Legacy API method name. Ignored by the typed protocol.
+  string method = 2;
+
+  // Legacy requested API operation or endpoint. Ignored by the typed protocol.
+  string request = 3;
+
+  // Legacy request payload. Ignored by the typed protocol.
+  // Python representation: dict.
+  google.protobuf.Struct data = 4;
+
+  // Endpoint where the APIResponse should be delivered
+  // (currently a RabbitMQ queue).
+  string response_queue = 5;
+
+  // Fully typed operation selector and payload.
+  oneof typed_request {
+    CreateTaskRequest create_task = 10;
+    TaskRequest task_status = 11;
+    TaskRequest task_result = 12;
+    TaskRequest cancel_reason = 13;
+    ListResourcesRequest list_resources = 14;
+    ResourceRequest resource_info = 15;
+    ResourceRequest pending_tasks = 16;
+  }
+}
+
+// API response envelope shared by two protocols.
+//
+// The typed protocol returns exactly one typed_response. The REST-like
+// compatibility protocol uses response_body instead.
+//
+// Request/response flow: APIRequest -> APIResponse
+//
+// Note: Protobuf serializes the complete APIResponse envelope. This differs
+// from the Python REST-like implementation, which serializes only
+// response_body as JSON.
+message APIResponse {
+  // REST-like response payload. Ignored by the typed protocol.
+  // Python representation: dict.
+  google.protobuf.Struct response_body = 1;
+
+  // Endpoint where the response message is delivered
+  // (currently a RabbitMQ queue).
+  string destination_queue = 2;
+
+  // Fully typed response selector and payload.
+  oneof typed_response {
+    CreateTaskResponse create_task = 10;
+    TaskStatusResponse task_status = 11;
+    TaskResultResponse task_result = 12;
+    CancelReasonResponse cancel_reason = 13;
+    ResourcesResponse resources = 14;
+    ResourceInfoResponse resource_info = 15;
+    PendingTasksResponse pending_tasks = 16;
+    ErrorResponse error = 17;
+  }
+}

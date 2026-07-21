@@ -10,15 +10,30 @@
 ## Table of Contents
 
 - [v1/messages.proto](#v1_messages-proto)
+    - [APIRequest](#mqss-protocol-v1-APIRequest)
+    - [APIResponse](#mqss-protocol-v1-APIResponse)
+    - [CancelReasonResponse](#mqss-protocol-v1-CancelReasonResponse)
     - [CircuitResult](#mqss-protocol-v1-CircuitResult)
     - [CircuitResult.CountsEntry](#mqss-protocol-v1-CircuitResult-CountsEntry)
+    - [CreateTaskRequest](#mqss-protocol-v1-CreateTaskRequest)
+    - [CreateTaskResponse](#mqss-protocol-v1-CreateTaskResponse)
+    - [ErrorResponse](#mqss-protocol-v1-ErrorResponse)
+    - [ListResourcesRequest](#mqss-protocol-v1-ListResourcesRequest)
+    - [PendingTasksResponse](#mqss-protocol-v1-PendingTasksResponse)
     - [QHeartBeat](#mqss-protocol-v1-QHeartBeat)
     - [QResourceInfo](#mqss-protocol-v1-QResourceInfo)
     - [QSRegisterEntry](#mqss-protocol-v1-QSRegisterEntry)
     - [QSRegistrationInfo](#mqss-protocol-v1-QSRegistrationInfo)
     - [QuantumResult](#mqss-protocol-v1-QuantumResult)
     - [QuantumTask](#mqss-protocol-v1-QuantumTask)
+    - [ResourceInfoResponse](#mqss-protocol-v1-ResourceInfoResponse)
+    - [ResourceRequest](#mqss-protocol-v1-ResourceRequest)
+    - [ResourcesResponse](#mqss-protocol-v1-ResourcesResponse)
+    - [TaskRequest](#mqss-protocol-v1-TaskRequest)
+    - [TaskResultResponse](#mqss-protocol-v1-TaskResultResponse)
+    - [TaskStatusResponse](#mqss-protocol-v1-TaskStatusResponse)
   
+    - [ApiTaskStatus](#mqss-protocol-v1-ApiTaskStatus)
     - [QsStatus](#mqss-protocol-v1-QsStatus)
   
 
@@ -28,6 +43,86 @@
 <p align="right"><a href="#top">Top</a></p>
 
 ## v1/messages.proto
+
+
+
+<a name="mqss-protocol-v1-APIRequest"></a>
+
+### APIRequest
+API request envelope shared by two protocols.
+
+The typed protocol selects an operation through typed_request and ignores
+method, request, and data. The REST-like compatibility protocol uses those
+fields instead.
+
+Request/response flow: APIRequest -> APIResponse
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| authorization | string |  | Authorization information, such as a token or credential string. |
+| method | string |  | Legacy API method name. Ignored by the typed protocol. |
+| request | string |  | Legacy requested API operation or endpoint. Ignored by the typed protocol. |
+| data | google.protobuf.Struct |  | Legacy request payload. Ignored by the typed protocol. Python representation: dict. |
+| response_queue | string |  | Endpoint where the APIResponse should be delivered (currently a RabbitMQ queue). |
+| create_task | CreateTaskRequest |  |  |
+| task_status | TaskRequest |  |  |
+| task_result | TaskRequest |  |  |
+| cancel_reason | TaskRequest |  |  |
+| list_resources | ListResourcesRequest |  |  |
+| resource_info | ResourceRequest |  |  |
+| pending_tasks | ResourceRequest |  |  |
+
+
+
+
+
+
+<a name="mqss-protocol-v1-APIResponse"></a>
+
+### APIResponse
+API response envelope shared by two protocols.
+
+The typed protocol returns exactly one typed_response. The REST-like
+compatibility protocol uses response_body instead.
+
+Request/response flow: APIRequest -> APIResponse
+
+Note: Protobuf serializes the complete APIResponse envelope. This differs
+from the Python REST-like implementation, which serializes only
+response_body as JSON.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| response_body | google.protobuf.Struct |  | REST-like response payload. Ignored by the typed protocol. Python representation: dict. |
+| destination_queue | string |  | Endpoint where the response message is delivered (currently a RabbitMQ queue). |
+| create_task | CreateTaskResponse |  |  |
+| task_status | TaskStatusResponse |  |  |
+| task_result | TaskResultResponse |  |  |
+| cancel_reason | CancelReasonResponse |  |  |
+| resources | ResourcesResponse |  |  |
+| resource_info | ResourceInfoResponse |  |  |
+| pending_tasks | PendingTasksResponse |  |  |
+| error | ErrorResponse |  |  |
+
+
+
+
+
+
+<a name="mqss-protocol-v1-CancelReasonResponse"></a>
+
+### CancelReasonResponse
+Typed response returned for a cancellation-reason query.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| cancel_reason | string |  | Human-readable cancellation reason. |
+
+
+
 
 
 
@@ -60,6 +155,87 @@ Python representation: dict[str, int].
 | ----- | ---- | ----- | ----------- |
 | key | string |  |  |
 | value | int32 |  |  |
+
+
+
+
+
+
+<a name="mqss-protocol-v1-CreateTaskRequest"></a>
+
+### CreateTaskRequest
+Typed payload for creating a quantum task through the API interface.
+
+Mirrors the payload used by the Python "job" POST operation while giving
+the typed protocol an explicit operation-specific request message.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| shots | int32 |  | Number of execution shots. |
+| circuit | string | repeated | Circuit file references. |
+| circuit_format | string |  | Circuit file format/type. |
+| resource_name | string |  | Preferred resource/backend name. |
+| no_modify | bool |  | If true, modifications to the task/circuit should be avoided. |
+
+
+
+
+
+
+<a name="mqss-protocol-v1-CreateTaskResponse"></a>
+
+### CreateTaskResponse
+Typed response returned after creating a task.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| uuid | int32 |  | Identifier assigned to the created task. |
+
+
+
+
+
+
+<a name="mqss-protocol-v1-ErrorResponse"></a>
+
+### ErrorResponse
+Typed error response.
+
+The Python implementation does not define stable error codes. The message
+is therefore diagnostic; clients should use the selected oneof case to
+identify an error.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| message | string |  |  |
+
+
+
+
+
+
+<a name="mqss-protocol-v1-ListResourcesRequest"></a>
+
+### ListResourcesRequest
+Typed request for listing available resources.
+
+
+
+
+
+
+<a name="mqss-protocol-v1-PendingTasksResponse"></a>
+
+### PendingTasksResponse
+Typed response returned for a pending-job query.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| num_pending_jobs | int32 |  | Number of pending jobs, matching the current Python API name. |
 
 
 
@@ -228,7 +404,116 @@ execution.
 
 
 
+
+<a name="mqss-protocol-v1-ResourceInfoResponse"></a>
+
+### ResourceInfoResponse
+Typed response returned for a resource-information query.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| name | string |  | Resource/backend name. |
+| num_qubits | int32 |  | Number of qubits provided by the resource. |
+| online | bool |  | Indicates whether the resource is currently available. |
+
+
+
+
+
+
+<a name="mqss-protocol-v1-ResourceRequest"></a>
+
+### ResourceRequest
+Typed request for an operation addressing a resource.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| resource_name | string |  | Resource/backend name. |
+
+
+
+
+
+
+<a name="mqss-protocol-v1-ResourcesResponse"></a>
+
+### ResourcesResponse
+Typed response returned for a resource-list query.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| resources | string | repeated | Available resource names. |
+
+
+
+
+
+
+<a name="mqss-protocol-v1-TaskRequest"></a>
+
+### TaskRequest
+Typed request for an operation addressing an existing task.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| uuid | int32 |  | Task identifier returned by the create-task operation. |
+
+
+
+
+
+
+<a name="mqss-protocol-v1-TaskResultResponse"></a>
+
+### TaskResultResponse
+Typed response returned for a task-result query.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| result | CircuitResult | repeated | Measurement results. |
+| timestamp_submitted | string |  | Submission timestamp. |
+| timestamp_scheduled | string |  | Scheduling timestamp. |
+| timestamp_completed | string |  | Completion timestamp. |
+
+
+
+
+
+
+<a name="mqss-protocol-v1-TaskStatusResponse"></a>
+
+### TaskStatusResponse
+Typed response returned for a task-status query.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| status | ApiTaskStatus |  | Current task status. |
+
+
+
+
+
  <!-- end messages -->
+
+
+<a name="mqss-protocol-v1-ApiTaskStatus"></a>
+
+### ApiTaskStatus
+Status of a task managed through the API interface.
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| API_TASK_STATUS_UNSPECIFIED | 0 |  |
+| API_TASK_STATUS_WAITING | 1 |  |
+| API_TASK_STATUS_COMPLETED | 2 |  |
+| API_TASK_STATUS_CANCELLED | 3 |  |
+
 
 
 <a name="mqss-protocol-v1-QsStatus"></a>
