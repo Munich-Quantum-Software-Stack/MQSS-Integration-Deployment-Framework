@@ -20,6 +20,7 @@ enum class StatusCode {
   Unsupported,
   InvalidArgument,
   Serialization,
+  Configuration,
   Internal,
 };
 
@@ -53,6 +54,11 @@ public:
   /// Serialization status.
   static Status serialization(std::string reason = {}) {
     return Status(StatusCode::Serialization, std::move(reason));
+  }
+
+  /// Configuration status.
+  static Status configuration(std::string reason = {}) {
+    return Status(StatusCode::Configuration, std::move(reason));
   }
 
   /// Internal-error status.

@@ -26,6 +26,28 @@ Operations do not throw exceptions. Instead, they return either:
 
 Errors are represented independently of transport and protocol layers.
 
+## Configuration
+
+The integration layer provides reusable support for application configuration.
+
+Generic configuration handling is separated from application-specific configuration definitions.
+Applications define their own configuration model, defaults, environment-variable mapping, and command-line options, while the common configuration layer performs loading, validation, precedence handling, and process-wide storage.
+
+Configuration values are applied in the following order:
+
+- build-time defaults
+- environment variables
+- command-line options
+
+Values from later sources override values from earlier sources.
+This allows applications to provide stable defaults while supporting deployment-specific and per-invocation overrides.
+
+Configuration values are converted to application-specific types before use.
+Invalid values and configuration lifecycle errors are reported through the common status and result model.
+
+The resulting configuration is stored as an immutable process-wide object.
+Applications typically define their configuration in a local configuration header and use the common configuration layer to load, initialize, and access it.
+
 ## Message Model
 
 The integration layer defines a transport-independent message model used to exchange data between components.
