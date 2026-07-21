@@ -131,6 +131,16 @@ scripts/check_qrm_workflow.sh
 
 See [QRM Workflow Example](examples/qrm_workflow.md) for details.
 
+## Build and Test QOffload Service
+
+Perform an end-to-end build and execution check:
+
+```bash
+scripts/check_qoffload_service.sh
+```
+
+See [QOffload Service](examples/qoffload_service.md) for details.
+
 ## Docker Development Container
 
 Build and enter the MQSS development container:
