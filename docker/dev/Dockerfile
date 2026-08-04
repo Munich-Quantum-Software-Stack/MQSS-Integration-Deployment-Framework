@@ -18,6 +18,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     librabbitmq-dev \
     libboost-chrono-dev \
     libboost-system-dev \
+    libboost-graph-dev \
     doxygen \
     graphviz \
     # Project examples
@@ -26,6 +27,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     \
     # MQSSCI dependencies
     curl \
+    python3 \
+    python3-pip \
+    libz3-dev \
     wget \
     ninja-build \
     libncurses-dev \
@@ -37,6 +41,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libssl-dev \
     libffi-dev \
   && rm -rf /var/lib/apt/lists/*
+
+RUN python3 -m pip install lit
 
 WORKDIR /workspace
 

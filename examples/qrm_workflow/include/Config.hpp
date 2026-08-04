@@ -41,12 +41,6 @@ struct LoggingConfig {
   std::string submitter_log;
 };
 
-struct ToolConfig {
-  std::string cudaq_quake;
-  std::string mqss_cudaq_opt;
-  std::string cudaq_opt;
-  std::string cudaq_translate;
-};
 
 struct PathConfig {
   std::string benchmark_dir;
@@ -62,7 +56,6 @@ struct Config {
   RabbitMqConfig rabbitmq;
   QueueConfig queues;
   LoggingConfig logging;
-  ToolConfig tools;
   PathConfig paths;
   QDMIDevices devices;
 };

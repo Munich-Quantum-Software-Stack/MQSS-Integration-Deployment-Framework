@@ -4,9 +4,16 @@
 #include "Config.hpp"
 #include "Logger.hpp"
 
+#include "Passes/Transforms/Dialects.h"
+#include "mlir/IR/BuiltinOps.h"
+#include "mlir/IR/MLIRContext.h"
+#include "mlir/Parser/Parser.h"
 #include "mqss/Messenger.hpp"
 #include "mqss/Protocol.hpp"
 #include "mqss/Transport.hpp"
+#include <mlir/Dialect/Func/IR/FuncOps.h>
+#include "Passes/Transforms/Transforms.h"
+#include "Passes/Transforms/pipelines.h"
 
 #include <array>
 #include <cstdio>
@@ -38,11 +45,9 @@ std::string stripSpuriousGateDefs(const std::string &qasm) {
   return result.str();
 }
 
-// Invokes cudaq-quake on `src_path` which convert the source to quake mlir
-// dialect. Then mqss-cudaq-opt is called to invoke mqss-passes on the quake
-// dialect Finally, cudaq-translate is called to translate the output to qasm or
-// qir. Returns the raw Quake MLIR as a string. result_type can be "qir",
-// "qir-full", "qir-adaptive", "qir-base", "openqasm2"
+
+// Invokes MQSS Compiler Passes on the input MLIR dialect found via `src_path`.
+// Also, converts the optimized/transformed dialect to OpenQasm2 (currently).
 static std::string lowerToOutputFormat(const std::string &src_path,
                                        int opt_level,
                                        const std::string &target_qpu,
@@ -56,50 +61,37 @@ static std::string lowerToOutputFormat(const std::string &src_path,
 
   close(fd);
 
-  std::string decomposition_cmd;
-  if (target_qpu == "iqm")
-    decomposition_cmd = "--iqm-gate-set-mapping";
-  else if (target_qpu == "fermioniq")
-    decomposition_cmd = "--fermioniq-gate-set-mapping";
-  else if (target_qpu == "ionq")
-    decomposition_cmd = "--ionq-gate-set-mapping";
-  else if (target_qpu == "oqc")
-    decomposition_cmd = "--oqc-gate-set-mapping";
-  else
-    decomposition_cmd = "";
-
-  auto tools = mqss::examples::qrm_workflow::getConfig().tools;
-
-  const std::string cmd =
-      std::string(tools.mqss_cudaq_opt) + " --O" + std::to_string(opt_level) +
-      " " + src_path + " | " + std::string(tools.cudaq_opt) + " " +
-      decomposition_cmd + " | " + std::string(tools.cudaq_translate) +
-      " --convert-to=" + result_type + " -o " + tmp_path;
-
-  spdlog::info("Shell command: {}", cmd);
-
-  int ret = std::system(cmd.c_str());
-  if (ret != 0) {
-    std::remove(tmp_path);
-    throw std::runtime_error("MQSS compiler pipeline failed with code: " +
-                             std::to_string(ret));
+  // 1. Create a MLIR context
+  auto contextptr = mqss::opt::createMQSSContext();
+  auto mlirctx = contextptr.get();
+  // 2. Parse the input MLIR dialect and create mlir::ModuleOp
+  auto module = mlir::parseSourceFile<mlir::ModuleOp>(
+      src_path, mlirctx);
+  if (!module) {
+    spdlog::error("failed to parse MLIR file\n");
   }
 
-  // Read the qasm/qir output
-  FILE *f = std::fopen(tmp_path, "r");
-  if (!f) {
-    std::remove(tmp_path);
-    throw std::runtime_error("failed to open compiler output file");
-  }
+  // 3. Declare the Pass Manager.
+  mlir::PassManager pm(mlirctx);
 
+  // 4. Register -O1 pass pipeline in the Pass Manager
+  mqss::opt::O1(pm);
+  // 5. Run the passes
+  if (mlir::failed(pm.run(*module))) { 
+    spdlog::error("Compiler: Pipelinefailed\n");
+  }
   std::string result;
-  std::array<char, 4096> buf;
-  while (std::fgets(buf.data(), buf.size(), f))
-    result += buf.data();
+  llvm::raw_string_ostream resultStream(result);
 
-  std::fclose(f);
-  std::remove(tmp_path);
-
+  // 6. Convert the final MLIR dialect to OpenQASM2
+  if(result_type == "OpenQasm2"){
+    pm.addPass(mqss::opt::QuakeToQASM2Pass(resultStream));
+  }
+  if (mlir::failed(pm.run(*module))) { 
+    spdlog::error("Compiler: Conversion to {} ", result_type, " failed");
+  }
+  resultStream.flush();
+  
   return result;
 }
 
@@ -113,12 +105,12 @@ static void applyOptimizationPasses(mqss::QuantumTask &task) {
     const auto &opt_level = task.optimisation_level();
     const auto &qpu = task.preferred_qpu();
 
-    // Final argument to lowerToOutputFormat can be set to:
-    // "qir", "qir-full", "qir-adaptive", "qir-base", "openqasm2"
-    std::string result_type = "openqasm2";
+    // Final argument to lowerToOutputFormat can be set to.
+    // Currently: OpenQasm2.
+    std::string result_type = "OpenQasm2";
     auto out_res =
         lowerToOutputFormat(circuit_file, opt_level, qpu, result_type);
-    if (result_type == "openqasm2") {
+    if (result_type == "OpenQasm2") {
       out_res = stripSpuriousGateDefs(out_res);
     }
 

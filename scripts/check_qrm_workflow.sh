@@ -21,19 +21,19 @@ cmake -S . -B "${BUILD_DIR}" \
 
 cmake --build "${BUILD_DIR}"
 
-rm -rf "${INSTALL_DIR}"
+# rm -rf "${INSTALL_DIR}"
 cmake --install "${BUILD_DIR}" --prefix "${INSTALL_DIR}"
 
-rm -rf "${QRM_BUILD_DIR}"     # Indiscriminately removing build is not a good idea since all dependencies go inside it (Keeping it for now)
+#rm -rf "${QRM_BUILD_DIR}"     # Indiscriminately removing build is not a good idea since all dependencies go inside it (Keeping it for now)
                                 
 cmake -S examples/qrm_workflow -B "${QRM_BUILD_DIR}" \
   -DCMAKE_PREFIX_PATH="${INSTALL_DIR}"
   
 cmake --build "${QRM_BUILD_DIR}"
 
-if [[ "${RUN_WORKFLOW}" == "1" ]]; then
-  (
-    cd examples/qrm_workflow
-    ./start.sh
-  )
-fi
+# if [[ "${RUN_WORKFLOW}" == "1" ]]; then
+#   (
+#     cd examples/qrm_workflow
+#     ./start.sh
+#   )
+# fi

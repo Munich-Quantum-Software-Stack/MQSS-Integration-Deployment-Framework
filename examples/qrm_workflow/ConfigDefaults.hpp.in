@@ -8,7 +8,7 @@
 namespace mqss::examples::qrm_workflow::defaults {
 
 // Static defaults.
-inline constexpr std::string_view amqp_host = "localhost";
+inline constexpr std::string_view amqp_host = "rabbitmq";
 inline constexpr int amqp_port = 5672;
 inline constexpr std::string_view amqp_user = "myuser";
 inline constexpr std::string_view amqp_password = "mypassword";
@@ -18,12 +18,6 @@ inline constexpr std::string_view scheduler_queue = "scheduler.tasks.queue";
 inline constexpr std::string_view compiler_queue = "compiler.tasks.queue";
 inline constexpr std::string_view results_queue = "test.results.queue";
 inline constexpr std::string_view submitter_queue = "submitter.tasks.queue";
-
-// Dynamic build-time paths (CMake generated).
-inline constexpr std::string_view cudaq_quake = "@QRM_CUDAQ_QUAKE@";
-inline constexpr std::string_view mqss_cudaq_opt = "@QRM_MQSS_CUDAQ_OPT@";
-inline constexpr std::string_view cudaq_opt = "@QRM_CUDAQ_OPT@";
-inline constexpr std::string_view cudaq_translate = "@QRM_CUDAQ_TRANSLATE@";
 
 inline constexpr std::string_view log_dir = "@QRM_LOG_DIR@";
 inline constexpr std::string_view benchmark_dir = "@QRM_BENCHMARK_DIR@";
