@@ -78,7 +78,7 @@ static std::string lowerToOutputFormat(const std::string &src_path,
   mqss::opt::O1(pm);
   // 5. Run the Optimization/Transformation passes
   if (mlir::failed(pm.run(*module))) { 
-    spdlog::error("Compiler: Pipelinefailed\n");
+    spdlog::error("Compiler: Pipeline failed\n");
   }
 
   // 6. Register and RUN the transpilation passes 
@@ -101,7 +101,8 @@ static std::string lowerToOutputFormat(const std::string &src_path,
     pm.addPass(mqss::opt::QuakeToQASM2Pass(resultStream));
   }
   if (mlir::failed(pm.run(*module))) { 
-    spdlog::error("Compiler: Conversion to {} ", result_type, " failed");
+    spdlog::error("Compiler: Conversion to {} failed", result_type);
+
   }
   resultStream.flush();
   
