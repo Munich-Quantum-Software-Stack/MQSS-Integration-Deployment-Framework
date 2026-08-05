@@ -13,7 +13,7 @@
 #include "mqss/Transport.hpp"
 #include <mlir/Dialect/Func/IR/FuncOps.h>
 #include "Passes/Transforms/Transforms.h"
-#include "Passes/Transforms/pipelines.h"
+#include "Passes/Transforms/Pipelines.h"
 
 #include <array>
 #include <cstdio>
