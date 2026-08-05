@@ -8,7 +8,7 @@
 namespace mqss::examples::qrm_workflow::defaults {
 
 // Static defaults.
-inline constexpr std::string_view amqp_host = "rabbitmq";
+inline constexpr std::string_view amqp_host = "localhost";
 inline constexpr int amqp_port = 5672;
 inline constexpr std::string_view amqp_user = "myuser";
 inline constexpr std::string_view amqp_password = "mypassword";

@@ -41,7 +41,7 @@ int main(int argc, char **argv) {
   task.set_optimisation_level(1);
   task.set_result_destination(std::string(config.queues.results));
   task.set_preferred_qpu(
-      ""); // Either iqm, fermioniq, ionq, oqc, quantinuum, qci
+      "planqc"); // Either planqc or iqm (Only planqc tested)
 
   auto circuit_file_path = std::filesystem::path(config.paths.benchmark_dir) /
                            "bell_state.mlir";
@@ -83,6 +83,7 @@ int main(int argc, char **argv) {
       spdlog::info(circuit);
     }
     spdlog::info("-->Results:");
+    // Note: We need to verify if the received results are correct or not.
     for(auto [key, count] : decoded.results(0).counts()){
         spdlog::info("count[{}] : {}" , key, count);
     }

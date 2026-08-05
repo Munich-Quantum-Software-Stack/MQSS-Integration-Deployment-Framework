@@ -3,8 +3,8 @@ set(CATALYST_AUTO_FETCH ON CACHE BOOL "" FORCE)
 
 include(FetchContent)
 FetchContent_Declare(mqssci
-  GIT_REPOSITORY https://github.com/akshay9594/MQSS-Passes-Suite.git
-  GIT_TAG        62eb2ebfc47446ad5302b1653b8ac8162ecc32d1 
+  GIT_REPOSITORY https://github.com/Munich-Quantum-Software-Stack/MQSS-Quantum-Compilation-Suite
+  GIT_TAG        v2.1.0 
 )
 
 FetchContent_MakeAvailable(mqssci)

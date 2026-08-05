@@ -74,16 +74,29 @@ static std::string lowerToOutputFormat(const std::string &src_path,
   // 3. Declare the Pass Manager.
   mlir::PassManager pm(mlirctx);
 
-  // 4. Register -O1 pass pipeline in the Pass Manager
+  // 4. Register -O1 Optimization/Transformation pass pipeline in the Pass Manager
   mqss::opt::O1(pm);
-  // 5. Run the passes
+  // 5. Run the Optimization/Transformation passes
   if (mlir::failed(pm.run(*module))) { 
     spdlog::error("Compiler: Pipelinefailed\n");
   }
+
+  // 6. Register and RUN the transpilation passes 
+  //   (Currently only BasisConversion or native-gate set decomposition)
+  BasisConversionPassOptions options;
+  if(target_qpu == "planqc")
+    options.gates= "rx,cz,rz";                   // Using PLANQC's native gate-set in this example
+  else
+   options.gates = "phased_rx, cz";             // IQM's native gate set (Not tested)
+
+  pm.addPass(mqss::opt::createBasisConversionPass(options));
+
   std::string result;
   llvm::raw_string_ostream resultStream(result);
-
-  // 6. Convert the final MLIR dialect to OpenQASM2
+  // 7. Convert the final MLIR dialect to OpenQASM2
+  // Note: PLANQC backend supports OpenQASM2. The MQT-Core DDSIM QDMI device
+  //       also supports OpenQASM2. Therefore in the future, the MQT-Core DDSIM
+  //       device can be easliy replaced with the PLANQC QDMI device.
   if(result_type == "OpenQasm2"){
     pm.addPass(mqss::opt::QuakeToQASM2Pass(resultStream));
   }
