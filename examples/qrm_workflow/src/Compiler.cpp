@@ -104,8 +104,6 @@ static std::string lowerToOutputFormat(const std::string &src_path,
     spdlog::error("Compiler: Conversion to {} failed", result_type);
 
   }
-  resultStream.flush();
-  
   return result;
 }
 

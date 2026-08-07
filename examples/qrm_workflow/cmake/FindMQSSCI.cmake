@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+# Copyright (c) MQSS Maintainers
+
 set(CUDAQ_AUTO_FETCH ON CACHE BOOL "" FORCE)
 set(CATALYST_AUTO_FETCH ON CACHE BOOL "" FORCE)
 

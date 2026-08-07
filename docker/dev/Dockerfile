@@ -43,12 +43,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libffi-dev \
   && rm -rf /var/lib/apt/lists/*
 
-RUN python3 -m venv /opt/venv \
-    && /opt/venv/bin/pip install --no-cache-dir --upgrade pip \
-    && /opt/venv/bin/pip install --no-cache-dir lit
-
-ENV PATH="/opt/venv/bin:${PATH}"
-
 WORKDIR /workspace
 
 CMD ["/bin/bash"]
