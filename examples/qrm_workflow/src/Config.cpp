@@ -87,17 +87,6 @@ Config loadConfig(int argc, char **argv) {
               .compiler_log = logPath(log_dir, "compiler.log"),
               .submitter_log = logPath(log_dir, "submitter.log"),
           },
-
-      .tools =
-          {
-              .cudaq_quake = getEnvOr("QRM_CUDAQ_QUAKE", defaults::cudaq_quake),
-              .mqss_cudaq_opt =
-                  getEnvOr("QRM_MQSS_CUDAQ_OPT", defaults::mqss_cudaq_opt),
-              .cudaq_opt = getEnvOr("QRM_CUDAQ_OPT", defaults::cudaq_opt),
-              .cudaq_translate =
-                  getEnvOr("QRM_CUDAQ_TRANSLATE", defaults::cudaq_translate),
-          },
-
       .paths =
           {
               .benchmark_dir =

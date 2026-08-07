@@ -20,7 +20,7 @@
 #include <string>
 #include <vector>
 
-void PrintDeviceName(QDMI_Device device){
+void PrintDeviceName(QDMI_Device device) {
   size_t namesSize = 0;
   size_t ret = 0;
   ret = QDMI_device_query_device_property(device, QDMI_DEVICE_PROPERTY_NAME, 0,
@@ -66,10 +66,16 @@ createAndSubmitQDMIJobToQDMIDevice(mqss::QuantumTask task) {
                                       size, devices.data(), nullptr);
 
   // Three devices are specified currently: MQT_NA, MQT_SC, MQT_DDSIM
-  QDMI_Device device = devices.back(); // the vendor device i.e. MQT_DDSIM
+  // Currently selecting: MQT_DDSIM
+  QDMI_Device device = devices[1]; // the vendor device i.e. MQT_DDSIM
 
   PrintDeviceName(device);
   auto circuit = task.circuit_files()[0];
+  spdlog::info("-->Executing circuit:");
+  for (auto c : task.circuit_files()) {
+    spdlog::info(c);
+  }
+
   ret = QDMI_device_create_job(device, &job);
   assert(ret == QDMI_SUCCESS);
 

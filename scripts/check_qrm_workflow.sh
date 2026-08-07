@@ -22,6 +22,7 @@ cmake -S . -B "${BUILD_DIR}" \
 cmake --build "${BUILD_DIR}"
 
 rm -rf "${INSTALL_DIR}"
+
 cmake --install "${BUILD_DIR}" --prefix "${INSTALL_DIR}"
 
 rm -rf "${QRM_BUILD_DIR}"     # Indiscriminately removing build is not a good idea since all dependencies go inside it (Keeping it for now)

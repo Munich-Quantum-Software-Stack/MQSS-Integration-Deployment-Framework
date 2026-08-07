@@ -18,6 +18,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     librabbitmq-dev \
     libboost-chrono-dev \
     libboost-system-dev \
+    libboost-graph-dev \
     doxygen \
     graphviz \
     # Project examples
@@ -26,6 +27,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     \
     # MQSSCI dependencies
     curl \
+    libz3-dev \
     wget \
     ninja-build \
     libncurses-dev \
