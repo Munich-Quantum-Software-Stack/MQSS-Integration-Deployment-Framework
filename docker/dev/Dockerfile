@@ -27,9 +27,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     \
     # MQSSCI dependencies
     curl \
-    python3 \
-    python3-pip \
-    python3-venv \
     libz3-dev \
     wget \
     ninja-build \
