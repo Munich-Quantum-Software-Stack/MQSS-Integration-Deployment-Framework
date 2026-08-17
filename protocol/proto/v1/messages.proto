@@ -262,6 +262,78 @@ message QResourceInfo {
   string instructions = 4;
 }
 
+// Circuit exchange formats
+enum CircuitFormat {
+  CIRCUIT_FORMAT_UNSPECIFIED = 0;
+  CIRCUIT_FORMAT_QASM2 = 1;
+  CIRCUIT_FORMAT_QASM3 = 2;
+  CIRCUIT_FORMAT_QIR = 3;
+  CIRCUIT_FORMAT_QIRBASESTRING = 4;
+  CIRCUIT_FORMAT_QIRBASEMODULE = 5;
+  CIRCUIT_FORMAT_QIRADAPTIVESTRING = 6;
+  CIRCUIT_FORMAT_QIRADAPTIVEMODULE = 7;
+  CIRCUIT_FORMAT_CALIBRATION = 8;
+  CIRCUIT_FORMAT_QPY = 9;
+  CIRCUIT_FORMAT_IQMJSON = 10;
+  CIRCUIT_FORMAT_BATCHJOB = 11;
+}
+
+// Type of a quantum backend
+enum BackendType {
+  BACKEND_TYPE_UNSPECIFIED = 0;
+  BACKEND_TYPE_SUPERCONDUCTING = 1;
+  BACKEND_TYPE_TRAPPED_ION = 2;
+  BACKEND_TYPE_NEUTRAL_ATOM = 3;
+  BACKEND_TYPE_PHOTONIC = 4;
+  BACKEND_TYPE_SIMULATOR = 5;
+}
+
+// Status of a quantum backend
+enum BackendStatus {
+  BACKEND_STATUS_OFFLINE = 0;
+  BACKEND_STATUS_IDLE = 1;
+  BACKEND_STATUS_BUSY = 2;
+  BACKEND_STATUS_ERROR = 3;
+  BACKEND_STATUS_MAINTENANCE = 4;
+  BACKEND_STATUS_CALIBRATION = 5;
+}
+
+message Backend {
+  // Unique name of the backend or QPU
+  string name = 1;
+
+  // Number of qubits provided by the backend
+  uint32 numQubits = 2;
+
+  // Type/Technology of the backend
+  BackendType type = 3;
+
+  // Status of the backend
+  BackendStatus status = 4;
+
+  // Current number of QuantumTasks in queue
+  uint32 taskQueueLength = 5;
+
+  // Current load, usually between 0.0 - 1.0
+  // A value of 0.0 indicates no load, while 1.0 indicates full load
+  // A value greater than 1.0 indicates overload
+  // A value less than 0.0 indicates an error or unknown load
+  float currentLoad = 6;
+  
+  // Endpoint to receives QuantumTask messages
+  // (currently a RabbitMQ queue).
+  string taskQueueName = 7;
+
+  // List of instructions supported by the backend
+  repeated string instructions = 8;
+
+  // Connectivity/Coupling map of the backend, represented as pair of qubit ids
+  map<string, string> connectivity = 9;
+
+  // Supported circuit file exchange formats/types, e.g., "qasm", "qir"
+  repeated CircuitFormat supportedCircuitFormats = 10;
+  }
+
 // Typed payload for creating a quantum task through the API interface.
 //
 // Mirrors the payload used by the Python "job" POST operation while giving
