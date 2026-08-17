@@ -13,7 +13,6 @@
     - [APIRequest](#mqss-protocol-v1-APIRequest)
     - [APIResponse](#mqss-protocol-v1-APIResponse)
     - [Backend](#mqss-protocol-v1-Backend)
-    - [Backend.ConnectivityEntry](#mqss-protocol-v1-Backend-ConnectivityEntry)
     - [CancelReasonResponse](#mqss-protocol-v1-CancelReasonResponse)
     - [CircuitResult](#mqss-protocol-v1-CircuitResult)
     - [CircuitResult.CountsEntry](#mqss-protocol-v1-CircuitResult-CountsEntry)
@@ -28,6 +27,7 @@
     - [QSRegistrationInfo](#mqss-protocol-v1-QSRegistrationInfo)
     - [QuantumResult](#mqss-protocol-v1-QuantumResult)
     - [QuantumTask](#mqss-protocol-v1-QuantumTask)
+    - [QubitPair](#mqss-protocol-v1-QubitPair)
     - [ResourceInfoResponse](#mqss-protocol-v1-ResourceInfoResponse)
     - [ResourceRequest](#mqss-protocol-v1-ResourceRequest)
     - [ResourcesResponse](#mqss-protocol-v1-ResourcesResponse)
@@ -132,24 +132,8 @@ response_body as JSON.
 | currentLoad | float |  | Current load, usually between 0.0 - 1.0 A value of 0.0 indicates no load, while 1.0 indicates full load A value greater than 1.0 indicates overload A value less than 0.0 indicates an error or unknown load |
 | taskQueueName | string |  | Endpoint to receives QuantumTask messages (currently a RabbitMQ queue). |
 | instructions | string | repeated | List of instructions supported by the backend |
-| connectivity | Backend.ConnectivityEntry | repeated | Connectivity/Coupling map of the backend, represented as pair of qubit ids |
+| connectivity | QubitPair | repeated | Connectivity/Coupling map of the backend, represented as pair of qubit ids |
 | supportedCircuitFormats | CircuitFormat | repeated | Supported circuit file exchange formats/types, e.g., "qasm", "qir" |
-
-
-
-
-
-
-<a name="mqss-protocol-v1-Backend-ConnectivityEntry"></a>
-
-### Backend.ConnectivityEntry
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| key | string |  |  |
-| value | string |  |  |
 
 
 
@@ -444,6 +428,22 @@ execution.
 | user_identity | string |  | User identity. |
 | token | string |  | Resource access token. |
 | via_hpc | bool |  | True if the task was submitted through the HPC integration; otherwise through the portal interface. |
+
+
+
+
+
+
+<a name="mqss-protocol-v1-QubitPair"></a>
+
+### QubitPair
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| qubit1 | uint32 |  |  |
+| qubit2 | uint32 |  |  |
 
 
 

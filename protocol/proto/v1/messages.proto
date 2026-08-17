@@ -297,7 +297,10 @@ enum BackendStatus {
   BACKEND_STATUS_MAINTENANCE = 4;
   BACKEND_STATUS_CALIBRATION = 5;
 }
-
+message QubitPair {
+  uint32 qubit1 = 1;
+  uint32 qubit2 = 2;
+}
 message Backend {
   // Unique name of the backend or QPU
   string name = 1;
@@ -328,7 +331,7 @@ message Backend {
   repeated string instructions = 8;
 
   // Connectivity/Coupling map of the backend, represented as pair of qubit ids
-  map<string, string> connectivity = 9;
+  repeated QubitPair connectivity = 9;
 
   // Supported circuit file exchange formats/types, e.g., "qasm", "qir"
   repeated CircuitFormat supportedCircuitFormats = 10;
