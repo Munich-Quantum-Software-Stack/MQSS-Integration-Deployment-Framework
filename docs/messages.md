@@ -12,6 +12,8 @@
 - [v1/messages.proto](#v1_messages-proto)
     - [APIRequest](#mqss-protocol-v1-APIRequest)
     - [APIResponse](#mqss-protocol-v1-APIResponse)
+    - [Backend](#mqss-protocol-v1-Backend)
+    - [Backend.ConnectivityEntry](#mqss-protocol-v1-Backend-ConnectivityEntry)
     - [CancelReasonResponse](#mqss-protocol-v1-CancelReasonResponse)
     - [CircuitResult](#mqss-protocol-v1-CircuitResult)
     - [CircuitResult.CountsEntry](#mqss-protocol-v1-CircuitResult-CountsEntry)
@@ -34,6 +36,9 @@
     - [TaskStatusResponse](#mqss-protocol-v1-TaskStatusResponse)
   
     - [ApiTaskStatus](#mqss-protocol-v1-ApiTaskStatus)
+    - [BackendStatus](#mqss-protocol-v1-BackendStatus)
+    - [BackendType](#mqss-protocol-v1-BackendType)
+    - [CircuitFormat](#mqss-protocol-v1-CircuitFormat)
     - [QsStatus](#mqss-protocol-v1-QsStatus)
   
 
@@ -105,6 +110,46 @@ response_body as JSON.
 | resource_info | ResourceInfoResponse |  |  |
 | pending_tasks | PendingTasksResponse |  |  |
 | error | ErrorResponse |  |  |
+
+
+
+
+
+
+<a name="mqss-protocol-v1-Backend"></a>
+
+### Backend
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| name | string |  | Unique name of the backend or QPU |
+| numQubits | uint32 |  | Number of qubits provided by the backend |
+| type | BackendType |  | Type/Technology of the backend |
+| status | BackendStatus |  | Status of the backend |
+| taskQueueLength | uint32 |  | Current number of QuantumTasks in queue |
+| currentLoad | float |  | Current load, usually between 0.0 - 1.0 A value of 0.0 indicates no load, while 1.0 indicates full load A value greater than 1.0 indicates overload A value less than 0.0 indicates an error or unknown load |
+| taskQueueName | string |  | Endpoint to receives QuantumTask messages (currently a RabbitMQ queue). |
+| instructions | string | repeated | List of instructions supported by the backend |
+| connectivity | Backend.ConnectivityEntry | repeated | Connectivity/Coupling map of the backend, represented as pair of qubit ids |
+| supportedCircuitFormats | CircuitFormat | repeated | Supported circuit file exchange formats/types, e.g., "qasm", "qir" |
+
+
+
+
+
+
+<a name="mqss-protocol-v1-Backend-ConnectivityEntry"></a>
+
+### Backend.ConnectivityEntry
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| key | string |  |  |
+| value | string |  |  |
 
 
 
@@ -513,6 +558,60 @@ Status of a task managed through the API interface.
 | API_TASK_STATUS_WAITING | 1 |  |
 | API_TASK_STATUS_COMPLETED | 2 |  |
 | API_TASK_STATUS_CANCELLED | 3 |  |
+
+
+
+<a name="mqss-protocol-v1-BackendStatus"></a>
+
+### BackendStatus
+Status of a quantum backend
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| BACKEND_STATUS_OFFLINE | 0 |  |
+| BACKEND_STATUS_IDLE | 1 |  |
+| BACKEND_STATUS_BUSY | 2 |  |
+| BACKEND_STATUS_ERROR | 3 |  |
+| BACKEND_STATUS_MAINTENANCE | 4 |  |
+| BACKEND_STATUS_CALIBRATION | 5 |  |
+
+
+
+<a name="mqss-protocol-v1-BackendType"></a>
+
+### BackendType
+Type of a quantum backend
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| BACKEND_TYPE_UNSPECIFIED | 0 |  |
+| BACKEND_TYPE_SUPERCONDUCTING | 1 |  |
+| BACKEND_TYPE_TRAPPED_ION | 2 |  |
+| BACKEND_TYPE_NEUTRAL_ATOM | 3 |  |
+| BACKEND_TYPE_PHOTONIC | 4 |  |
+| BACKEND_TYPE_SIMULATOR | 5 |  |
+
+
+
+<a name="mqss-protocol-v1-CircuitFormat"></a>
+
+### CircuitFormat
+Circuit exchange formats
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| CIRCUIT_FORMAT_UNSPECIFIED | 0 |  |
+| CIRCUIT_FORMAT_QASM2 | 1 |  |
+| CIRCUIT_FORMAT_QASM3 | 2 |  |
+| CIRCUIT_FORMAT_QIR | 3 |  |
+| CIRCUIT_FORMAT_QIRBASESTRING | 4 |  |
+| CIRCUIT_FORMAT_QIRBASEMODULE | 5 |  |
+| CIRCUIT_FORMAT_QIRADAPTIVESTRING | 6 |  |
+| CIRCUIT_FORMAT_QIRADAPTIVEMODULE | 7 |  |
+| CIRCUIT_FORMAT_CALIBRATION | 8 |  |
+| CIRCUIT_FORMAT_QPY | 9 |  |
+| CIRCUIT_FORMAT_IQMJSON | 10 |  |
+| CIRCUIT_FORMAT_BATCHJOB | 11 |  |
 
 
 
