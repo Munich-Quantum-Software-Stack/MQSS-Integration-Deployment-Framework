@@ -290,12 +290,13 @@ enum BackendType {
 
 // Status of a quantum backend
 enum BackendStatus {
-  BACKEND_STATUS_OFFLINE = 0;
-  BACKEND_STATUS_IDLE = 1;
-  BACKEND_STATUS_BUSY = 2;
-  BACKEND_STATUS_ERROR = 3;
-  BACKEND_STATUS_MAINTENANCE = 4;
-  BACKEND_STATUS_CALIBRATION = 5;
+  BACKEND_STATUS_UNSPECIFIED = 0;
+  BACKEND_STATUS_OFFLINE = 1;
+  BACKEND_STATUS_IDLE = 2;
+  BACKEND_STATUS_BUSY = 3;
+  BACKEND_STATUS_ERROR = 4;
+  BACKEND_STATUS_MAINTENANCE = 5;
+  BACKEND_STATUS_CALIBRATION = 6;
 }
 message QubitPair {
   uint32 qubit1 = 1;
@@ -306,7 +307,7 @@ message Backend {
   string name = 1;
 
   // Number of qubits provided by the backend
-  uint32 numQubits = 2;
+  uint32 num_qubits = 2;
 
   // Type/Technology of the backend
   BackendType type = 3;
@@ -315,17 +316,17 @@ message Backend {
   BackendStatus status = 4;
 
   // Current number of QuantumTasks in queue
-  uint32 taskQueueLength = 5;
+  uint32 queue_length = 5;
 
   // Current load, usually between 0.0 - 1.0
   // A value of 0.0 indicates no load, while 1.0 indicates full load
   // A value greater than 1.0 indicates overload
   // A value less than 0.0 indicates an error or unknown load
-  float currentLoad = 6;
+  float current_load = 6;
   
   // Endpoint to receives QuantumTask messages
   // (currently a RabbitMQ queue).
-  string taskQueueName = 7;
+  string queue_name = 7;
 
   // List of instructions supported by the backend
   repeated string instructions = 8;
@@ -334,7 +335,7 @@ message Backend {
   repeated QubitPair connectivity = 9;
 
   // Supported circuit file exchange formats/types, e.g., "qasm", "qir"
-  repeated CircuitFormat supportedCircuitFormats = 10;
+  repeated CircuitFormat supported_circuit_formats = 10;
   }
 
 // Typed payload for creating a quantum task through the API interface.

@@ -125,15 +125,15 @@ response_body as JSON.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | name | string |  | Unique name of the backend or QPU |
-| numQubits | uint32 |  | Number of qubits provided by the backend |
+| num_qubits | uint32 |  | Number of qubits provided by the backend |
 | type | BackendType |  | Type/Technology of the backend |
 | status | BackendStatus |  | Status of the backend |
-| taskQueueLength | uint32 |  | Current number of QuantumTasks in queue |
-| currentLoad | float |  | Current load, usually between 0.0 - 1.0 A value of 0.0 indicates no load, while 1.0 indicates full load A value greater than 1.0 indicates overload A value less than 0.0 indicates an error or unknown load |
-| taskQueueName | string |  | Endpoint to receives QuantumTask messages (currently a RabbitMQ queue). |
+| queue_length | uint32 |  | Current number of QuantumTasks in queue |
+| current_load | float |  | Current load, usually between 0.0 - 1.0 A value of 0.0 indicates no load, while 1.0 indicates full load A value greater than 1.0 indicates overload A value less than 0.0 indicates an error or unknown load |
+| queue_name | string |  | Endpoint to receives QuantumTask messages (currently a RabbitMQ queue). |
 | instructions | string | repeated | List of instructions supported by the backend |
 | connectivity | QubitPair | repeated | Connectivity/Coupling map of the backend, represented as pair of qubit ids |
-| supportedCircuitFormats | CircuitFormat | repeated | Supported circuit file exchange formats/types, e.g., "qasm", "qir" |
+| supported_circuit_formats | CircuitFormat | repeated | Supported circuit file exchange formats/types, e.g., "qasm", "qir" |
 
 
 
@@ -568,12 +568,13 @@ Status of a quantum backend
 
 | Name | Number | Description |
 | ---- | ------ | ----------- |
-| BACKEND_STATUS_OFFLINE | 0 |  |
-| BACKEND_STATUS_IDLE | 1 |  |
-| BACKEND_STATUS_BUSY | 2 |  |
-| BACKEND_STATUS_ERROR | 3 |  |
-| BACKEND_STATUS_MAINTENANCE | 4 |  |
-| BACKEND_STATUS_CALIBRATION | 5 |  |
+| BACKEND_STATUS_UNSPECIFIED | 0 |  |
+| BACKEND_STATUS_OFFLINE | 1 |  |
+| BACKEND_STATUS_IDLE | 2 |  |
+| BACKEND_STATUS_BUSY | 3 |  |
+| BACKEND_STATUS_ERROR | 4 |  |
+| BACKEND_STATUS_MAINTENANCE | 5 |  |
+| BACKEND_STATUS_CALIBRATION | 6 |  |
 
 
 
