@@ -12,7 +12,7 @@ ci:
   autoupdate_schedule: quarterly
   autofix_commit_msg: "🎨 pre-commit fixes"
 
-exclude: ^(docs/api/|docs/.*\.(svg|drawio|png)$)
+exclude: ^docs/
 
 repos:
   # Standard hooks
