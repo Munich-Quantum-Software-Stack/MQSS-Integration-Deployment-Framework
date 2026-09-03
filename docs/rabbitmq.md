@@ -26,10 +26,10 @@ docker run -d \
   rabbitmq:3-management
 ```
 
-| Port  | Purpose                        |
-|-------|--------------------------------|
-| 5672  | AMQP protocol (messaging)      |
-| 15672 | Management UI (HTTP)           |
+| Port  | Purpose                   |
+| ----- | ------------------------- |
+| 5672  | AMQP protocol (messaging) |
+| 15672 | Management UI (HTTP)      |
 
 > **Important:** Always use port `5672` for your application connections. Port `15672` is HTTP only — connecting your AMQP client to it will cause an immediate "connection closed unexpectedly" error.
 
@@ -200,7 +200,7 @@ const std::string scheduler_queue = "scheduler.tasks.queue";
 const std::string results_queue = "test.results.queue";
 ```
 
-Note: Currently these queues are set within the root CMakeLists.txt i.e. ```QRM/CMakeLists.txt```.
+Note: Currently these queues are set within the root CMakeLists.txt i.e. `QRM/CMakeLists.txt`.
 
 ### Clean Shutdown of Executables
 
@@ -228,13 +228,13 @@ trap "kill -SIGTERM $SCHEDULER_PID $COMPILER_PID $TEST_PID; wait; echo 'Stopped.
 
 ## 6. Quick Reference
 
-| Task                          | Command                                                                 |
-|-------------------------------|-------------------------------------------------------------------------|
-| Start RabbitMQ container      | `docker compose up -d`                                                  |
-| Stop RabbitMQ container       | `docker compose down`                                                   |
-| Open management UI            | `http://localhost:15672`                                                |
-| List queues                   | `docker exec -it rabbitmq rabbitmqadmin list queues`                    |
-| List consumers                | `docker exec -it rabbitmq rabbitmqadmin list consumers`                 |
-| Clear stale connections       | `docker exec -it rabbitmq rabbitmqctl close_all_connections "stale"`    |
-| Delete a queue                | `docker exec -it rabbitmq rabbitmqadmin delete queue name=<queue_name>` |
-| Restart broker                | `docker restart rabbitmq`                                               |
+| Task                     | Command                                                                 |
+| ------------------------ | ----------------------------------------------------------------------- |
+| Start RabbitMQ container | `docker compose up -d`                                                  |
+| Stop RabbitMQ container  | `docker compose down`                                                   |
+| Open management UI       | `http://localhost:15672`                                                |
+| List queues              | `docker exec -it rabbitmq rabbitmqadmin list queues`                    |
+| List consumers           | `docker exec -it rabbitmq rabbitmqadmin list consumers`                 |
+| Clear stale connections  | `docker exec -it rabbitmq rabbitmqctl close_all_connections "stale"`    |
+| Delete a queue           | `docker exec -it rabbitmq rabbitmqadmin delete queue name=<queue_name>` |
+| Restart broker           | `docker restart rabbitmq`                                               |

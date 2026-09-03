@@ -29,7 +29,6 @@ package mqss.protocol.v1;
 
 import "google/protobuf/struct.proto";
 
-
 // Task submitted for quantum circuit execution.
 //
 // Part of the asynchronous task execution flow: QuantumTask -> QuantumResult
@@ -115,9 +114,7 @@ message QuantumTask {
 // Each entry maps measured bitstrings to the number of times they were
 // observed during repeated execution.
 // Python representation: dict[str, int].
-message CircuitResult {
-  map<string, int32> counts = 1;
-}
+message CircuitResult { map<string, int32> counts = 1; }
 
 // Result of a completed quantum task execution.
 //
@@ -197,7 +194,8 @@ message QSRegistrationInfo {
   // Unique identifier assigned by the resource manager for the backend.
   int32 uid = 1;
 
-  // Endpoint where heartbeat messages should be sent (currently a RabbitMQ queue).
+  // Endpoint where heartbeat messages should be sent (currently a RabbitMQ
+  // queue).
   string heartbeat_queue = 2;
 
   // Heartbeat interval (unit unspecified).
@@ -323,7 +321,7 @@ message Backend {
   // A value greater than 1.0 indicates overload
   // A value less than 0.0 indicates an error or unknown load
   float current_load = 6;
-  
+
   // Endpoint to receives QuantumTask messages
   // (currently a RabbitMQ queue).
   string queue_name = 7;
@@ -336,7 +334,7 @@ message Backend {
 
   // Supported circuit file exchange formats/types, e.g., "qasm", "qir"
   repeated CircuitFormat supported_circuit_formats = 10;
-  }
+}
 
 // Typed payload for creating a quantum task through the API interface.
 //
@@ -444,9 +442,7 @@ message PendingTasksResponse {
 // The Python implementation does not define stable error codes. The message
 // is therefore diagnostic; clients should use the selected oneof case to
 // identify an error.
-message ErrorResponse {
-  string message = 1;
-}
+message ErrorResponse { string message = 1; }
 
 // API request envelope shared by two protocols.
 //

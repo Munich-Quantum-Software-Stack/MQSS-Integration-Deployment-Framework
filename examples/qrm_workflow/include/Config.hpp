@@ -41,13 +41,12 @@ struct LoggingConfig {
   std::string submitter_log;
 };
 
-
 struct PathConfig {
   std::string benchmark_dir;
   std::string qdmi_device_objs_dir;
 };
 
-struct QDMIDevices{
+struct QDMIDevices {
   std::string qdmi_device_obj;
   std::string qdmi_device_prefix;
 };

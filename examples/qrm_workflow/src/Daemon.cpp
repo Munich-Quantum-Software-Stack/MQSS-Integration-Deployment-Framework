@@ -40,11 +40,10 @@ int main(int argc, char **argv) {
   task.set_n_shots(0);
   task.set_optimisation_level(1);
   task.set_result_destination(std::string(config.queues.results));
-  task.set_preferred_qpu(
-      "planqc"); // Either planqc or iqm (Only planqc tested)
+  task.set_preferred_qpu("planqc"); // Either planqc or iqm (Only planqc tested)
 
-  auto circuit_file_path = std::filesystem::path(config.paths.benchmark_dir) /
-                           "bell_state.mlir";
+  auto circuit_file_path =
+      std::filesystem::path(config.paths.benchmark_dir) / "bell_state.mlir";
 
   task.add_circuit_files(circuit_file_path);
   task.set_circuit_file_type("cpp");
@@ -72,7 +71,7 @@ int main(int argc, char **argv) {
   }
 
   spdlog::info("Task received by daemon queue");
-  
+
   if (res.has_value()) {
     spdlog::info("Results Received by Test/Daemon Queue!");
     const auto &decoded = *res;
@@ -84,8 +83,8 @@ int main(int argc, char **argv) {
     }
     spdlog::info("-->Results:");
     // Note: We need to verify if the received results are correct or not.
-    for(auto [key, count] : decoded.results(0).counts()){
-        spdlog::info("count[{}] : {}" , key, count);
+    for (auto [key, count] : decoded.results(0).counts()) {
+      spdlog::info("count[{}] : {}", key, count);
     }
   }
 

@@ -19,7 +19,8 @@
 #include <string>
 
 namespace qdmi_main_driver {
-template <class Concrete> class Singleton {
+template <class Concrete>
+class Singleton {
 protected:
   /// @brief Protected constructor to enforce the singleton pattern.
   Singleton() = default;
@@ -31,19 +32,19 @@ public:
   // - Users access the singleton via get() which returns a reference
   // - Moving would invalidate the singleton's state
   // - Users never own the singleton instance
-  Singleton(Singleton&&) = delete;
-  Singleton& operator=(Singleton&&) = delete;
+  Singleton(Singleton &&) = delete;
+  Singleton &operator=(Singleton &&) = delete;
   // Delete copy constructor and assignment operator to enforce singleton.
-  Singleton(const Singleton&) = delete;
-  Singleton& operator=(const Singleton&) = delete;
+  Singleton(const Singleton &) = delete;
+  Singleton &operator=(const Singleton &) = delete;
 
   /// @brief Virtual destructor for the Singleton base class.
   virtual ~Singleton() = default;
 
   /// @returns the singleton instance of the derived class.
-  [[nodiscard]] static auto get() -> Concrete& {
+  [[nodiscard]] static auto get() -> Concrete & {
     // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-    static auto* instance = new Concrete();
+    static auto *instance = new Concrete();
     // The instance is intentionally leaked to avoid static deinitialization
     // issues (cf. static (de)initialization order fiasco)
     return *instance;
@@ -73,7 +74,7 @@ public:
         if ((size) < sizeof(prop_type)) {                                      \
           return QDMI_ERROR_INVALIDARGUMENT;                                   \
         }                                                                      \
-        *static_cast<prop_type*>(value) = prop_value;                          \
+        *static_cast<prop_type *>(value) = prop_value;                         \
       }                                                                        \
       if ((size_ret) != nullptr) {                                             \
         *size_ret = sizeof(prop_type);                                         \
@@ -86,9 +87,9 @@ public:
 // strncpy on other platforms (requires manual null-termination - see usage).
 #ifdef _WIN32
 #define STRNCPY(dest, src, size)                                               \
-  strncpy_s(static_cast<char*>(dest), size, src, size);
+  strncpy_s(static_cast<char *>(dest), size, src, size);
 #else
-#define STRNCPY(dest, src, size) strncpy(static_cast<char*>(dest), src, size);
+#define STRNCPY(dest, src, size) strncpy(static_cast<char *>(dest), src, size);
 #endif
 
 #define ADD_STRING_PROPERTY(prop_name, prop_value, prop, size, value,          \
@@ -102,7 +103,7 @@ public:
         STRNCPY(value, prop_value, size);                                      \
         /* Ensure null-termination: strncpy doesn't guarantee it on non-Win */ \
         /* NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic) */  \
-        static_cast<char*>(value)[size - 1] = '\0';                            \
+        static_cast<char *>(value)[size - 1] = '\0';                           \
       }                                                                        \
       if ((size_ret) != nullptr) {                                             \
         *size_ret = strlen(prop_value) + 1;                                    \
@@ -119,8 +120,8 @@ public:
         if ((size) < (prop_values).size() * sizeof(prop_type)) {               \
           return QDMI_ERROR_INVALIDARGUMENT;                                   \
         }                                                                      \
-        memcpy(static_cast<void*>(value),                                      \
-               static_cast<const void*>((prop_values).data()),                 \
+        memcpy(static_cast<void *>(value),                                     \
+               static_cast<const void *>((prop_values).data()),                \
                (prop_values).size() * sizeof(prop_type));                      \
       }                                                                        \
       if ((size_ret) != nullptr) {                                             \
@@ -137,7 +138,7 @@ public:
 // NOLINTEND(bugprone-macro-parentheses)
 
 /// Returns the string representation of the given status code @p result.
-constexpr auto toString(const QDMI_STATUS result) -> const char* {
+constexpr auto toString(const QDMI_STATUS result) -> const char * {
   switch (result) {
   case QDMI_WARN_GENERAL:
     return "General warning";
@@ -178,10 +179,10 @@ constexpr auto toString(const QDMI_STATUS result) -> const char* {
  * @throws std::invalid_argument if the result is QDMI_ERROR_INVALIDARGUMENT
  * @throws std::runtime_error for all other error results
  */
-auto throwIfError(int result, const std::string& msg) -> void;
+auto throwIfError(int result, const std::string &msg) -> void;
 
 /// Returns the string representation of the given session parameter @p param.
-constexpr auto toString(const QDMI_Session_Parameter param) -> const char* {
+constexpr auto toString(const QDMI_Session_Parameter param) -> const char * {
   switch (param) {
   case QDMI_SESSION_PARAMETER_TOKEN:
     return "TOKEN";
@@ -212,7 +213,7 @@ constexpr auto toString(const QDMI_Session_Parameter param) -> const char* {
 }
 
 /// Returns the string representation of the given session property @p prop.
-constexpr auto toString(const QDMI_Session_Property prop) -> const char* {
+constexpr auto toString(const QDMI_Session_Property prop) -> const char * {
   switch (prop) {
   case QDMI_SESSION_PROPERTY_DEVICES:
     return "DEVICES";
@@ -235,7 +236,7 @@ constexpr auto toString(const QDMI_Session_Property prop) -> const char* {
 /// Returns the string representation of the given device session parameter
 /// @p param.
 constexpr auto toString(const QDMI_Device_Session_Parameter param) -> const
-    char* {
+    char * {
   switch (param) {
   case QDMI_DEVICE_SESSION_PARAMETER_BASEURL:
     return "BASE URL";
@@ -266,7 +267,7 @@ constexpr auto toString(const QDMI_Device_Session_Parameter param) -> const
 }
 
 /// Returns the string representation of the given site property @p prop.
-constexpr auto toString(const QDMI_Site_Property prop) -> const char* {
+constexpr auto toString(const QDMI_Site_Property prop) -> const char * {
   switch (prop) {
   case QDMI_SITE_PROPERTY_INDEX:
     return "INDEX";
@@ -311,7 +312,7 @@ constexpr auto toString(const QDMI_Site_Property prop) -> const char* {
 }
 
 /// Returns the string representation of the given operation property @p prop.
-constexpr auto toString(const QDMI_Operation_Property prop) -> const char* {
+constexpr auto toString(const QDMI_Operation_Property prop) -> const char * {
   switch (prop) {
   case QDMI_OPERATION_PROPERTY_NAME:
     return "NAME";
@@ -352,7 +353,7 @@ constexpr auto toString(const QDMI_Operation_Property prop) -> const char* {
 }
 
 /// Returns the string representation of the given device property @p prop.
-constexpr auto toString(const QDMI_Device_Property prop) -> const char* {
+constexpr auto toString(const QDMI_Device_Property prop) -> const char * {
   switch (prop) {
   case QDMI_DEVICE_PROPERTY_NAME:
     return "NAME";
@@ -402,4 +403,4 @@ constexpr auto toString(const QDMI_Device_Property prop) -> const char* {
   unreachable();
 }
 
-} // namespace qdmi
+} // namespace qdmi_main_driver
