@@ -1,5 +1,5 @@
-# SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception Copyright (c) MQSS
-# Maintainers
+# SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+# Copyright (c) MQSS Maintainers
 
 function(mqss_add_transport name)
   cmake_parse_arguments(ARG "" "" "SOURCES;PUBLIC_LIBS;PRIVATE_LIBS" ${ARGN})

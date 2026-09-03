@@ -1,5 +1,5 @@
-# SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception Copyright (c) MQSS
-# Maintainers
+# SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+# Copyright (c) MQSS Maintainers
 
 find_package(Protobuf REQUIRED)
 

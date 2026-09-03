@@ -1,5 +1,5 @@
-# SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception Copyright (c) MQSS
-# Maintainers
+# SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+# Copyright (c) MQSS Maintainers
 
 # CMake 3.28+ is required for FetchContent_Declare(EXCLUDE_FROM_ALL) used by
 # SimpleAmqpClient integration.

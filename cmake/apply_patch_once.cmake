@@ -1,5 +1,5 @@
-# SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception Copyright (c) MQSS
-# Maintainers
+# SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+# Copyright (c) MQSS Maintainers
 
 # FetchContent PATCH_COMMAND is executed again during re-configuration of an
 # existing build tree. Since 'git apply' is not idempotent, re-applying an
