@@ -2,3 +2,8 @@ BasedOnStyle: LLVM
 AlwaysBreakTemplateDeclarations: Yes
 InsertNewlineAtEOF: Yes
 ReflowComments: true
+---
+Language: Proto
+BasedOnStyle: Google
+InsertNewlineAtEOF: Yes
+ReflowComments: true

@@ -29,7 +29,6 @@ package mqss.protocol.v1;
 
 import "google/protobuf/struct.proto";
 
-
 // Task submitted for quantum circuit execution.
 //
 // Part of the asynchronous task execution flow: QuantumTask -> QuantumResult
@@ -197,7 +196,8 @@ message QSRegistrationInfo {
   // Unique identifier assigned by the resource manager for the backend.
   int32 uid = 1;
 
-  // Endpoint where heartbeat messages should be sent (currently a RabbitMQ queue).
+  // Endpoint where heartbeat messages should be sent (currently a RabbitMQ
+  // queue).
   string heartbeat_queue = 2;
 
   // Heartbeat interval (unit unspecified).
@@ -336,7 +336,7 @@ message Backend {
 
   // Supported circuit file exchange formats/types, e.g., "qasm", "qir"
   repeated CircuitFormat supported_circuit_formats = 10;
-  }
+}
 
 // Typed payload for creating a quantum task through the API interface.
 //

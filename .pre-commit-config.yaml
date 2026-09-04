@@ -26,6 +26,8 @@ repos:
       - id: check-symlinks
       - id: check-toml
       - id: check-yaml
+        # .clang-format is a multi-document YAML stream (one section per language)
+        args: [--allow-multiple-documents]
       - id: debug-statements
       - id: end-of-file-fixer
       - id: mixed-line-ending
@@ -59,7 +61,7 @@ repos:
     rev: v22.1.5
     hooks:
       - id: clang-format
-        types_or: [c++, c, cuda]
+        types_or: [c++, c, cuda, proto]
         args: ["-i"] # in-place
 
   # CMake format the CMakeLists.txt files
