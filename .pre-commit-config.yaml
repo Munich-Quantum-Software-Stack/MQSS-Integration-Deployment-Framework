@@ -12,7 +12,7 @@ ci:
   autoupdate_schedule: quarterly
   autofix_commit_msg: "🎨 pre-commit fixes"
 
-exclude: ^docs/
+exclude: "^(docs|patches)/"
 
 repos:
   # Standard hooks
@@ -31,6 +31,7 @@ repos:
       - id: mixed-line-ending
       - id: requirements-txt-fixer
       - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
 
   # Handling unwanted unicode characters
   - repo: https://github.com/sirosen/texthooks
