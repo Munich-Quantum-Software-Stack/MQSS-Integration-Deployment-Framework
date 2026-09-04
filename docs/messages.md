@@ -12,6 +12,7 @@
 - [v1/messages.proto](#v1_messages-proto)
     - [APIRequest](#mqss-protocol-v1-APIRequest)
     - [APIResponse](#mqss-protocol-v1-APIResponse)
+    - [Backend](#mqss-protocol-v1-Backend)
     - [CancelReasonResponse](#mqss-protocol-v1-CancelReasonResponse)
     - [CircuitResult](#mqss-protocol-v1-CircuitResult)
     - [CircuitResult.CountsEntry](#mqss-protocol-v1-CircuitResult-CountsEntry)
@@ -26,6 +27,7 @@
     - [QSRegistrationInfo](#mqss-protocol-v1-QSRegistrationInfo)
     - [QuantumResult](#mqss-protocol-v1-QuantumResult)
     - [QuantumTask](#mqss-protocol-v1-QuantumTask)
+    - [QubitPair](#mqss-protocol-v1-QubitPair)
     - [ResourceInfoResponse](#mqss-protocol-v1-ResourceInfoResponse)
     - [ResourceRequest](#mqss-protocol-v1-ResourceRequest)
     - [ResourcesResponse](#mqss-protocol-v1-ResourcesResponse)
@@ -34,6 +36,9 @@
     - [TaskStatusResponse](#mqss-protocol-v1-TaskStatusResponse)
   
     - [ApiTaskStatus](#mqss-protocol-v1-ApiTaskStatus)
+    - [BackendStatus](#mqss-protocol-v1-BackendStatus)
+    - [BackendType](#mqss-protocol-v1-BackendType)
+    - [CircuitFormat](#mqss-protocol-v1-CircuitFormat)
     - [QsStatus](#mqss-protocol-v1-QsStatus)
   
 
@@ -105,6 +110,30 @@ response_body as JSON.
 | resource_info | ResourceInfoResponse |  |  |
 | pending_tasks | PendingTasksResponse |  |  |
 | error | ErrorResponse |  |  |
+
+
+
+
+
+
+<a name="mqss-protocol-v1-Backend"></a>
+
+### Backend
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| name | string |  | Unique name of the backend or QPU |
+| num_qubits | uint32 |  | Number of qubits provided by the backend |
+| type | BackendType |  | Type/Technology of the backend |
+| status | BackendStatus |  | Status of the backend |
+| queue_length | uint32 |  | Current number of QuantumTasks in queue |
+| current_load | float |  | Current load, usually between 0.0 - 1.0 A value of 0.0 indicates no load, while 1.0 indicates full load A value greater than 1.0 indicates overload A value less than 0.0 indicates an error or unknown load |
+| queue_name | string |  | Endpoint to receives QuantumTask messages (currently a RabbitMQ queue). |
+| instructions | string | repeated | List of instructions supported by the backend |
+| connectivity | QubitPair | repeated | Connectivity/Coupling map of the backend, represented as pair of qubit ids |
+| supported_circuit_formats | CircuitFormat | repeated | Supported circuit file exchange formats/types, e.g., "qasm", "qir" |
 
 
 
@@ -405,6 +434,22 @@ execution.
 
 
 
+<a name="mqss-protocol-v1-QubitPair"></a>
+
+### QubitPair
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| qubit1 | uint32 |  |  |
+| qubit2 | uint32 |  |  |
+
+
+
+
+
+
 <a name="mqss-protocol-v1-ResourceInfoResponse"></a>
 
 ### ResourceInfoResponse
@@ -516,6 +561,61 @@ Status of a task managed through the API interface.
 
 
 
+<a name="mqss-protocol-v1-BackendStatus"></a>
+
+### BackendStatus
+Status of a quantum backend
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| BACKEND_STATUS_UNSPECIFIED | 0 |  |
+| BACKEND_STATUS_OFFLINE | 1 |  |
+| BACKEND_STATUS_IDLE | 2 |  |
+| BACKEND_STATUS_BUSY | 3 |  |
+| BACKEND_STATUS_ERROR | 4 |  |
+| BACKEND_STATUS_MAINTENANCE | 5 |  |
+| BACKEND_STATUS_CALIBRATION | 6 |  |
+
+
+
+<a name="mqss-protocol-v1-BackendType"></a>
+
+### BackendType
+Type of a quantum backend
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| BACKEND_TYPE_UNSPECIFIED | 0 |  |
+| BACKEND_TYPE_SUPERCONDUCTING | 1 |  |
+| BACKEND_TYPE_TRAPPED_ION | 2 |  |
+| BACKEND_TYPE_NEUTRAL_ATOM | 3 |  |
+| BACKEND_TYPE_PHOTONIC | 4 |  |
+| BACKEND_TYPE_SIMULATOR | 5 |  |
+
+
+
+<a name="mqss-protocol-v1-CircuitFormat"></a>
+
+### CircuitFormat
+Circuit exchange formats
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| CIRCUIT_FORMAT_UNSPECIFIED | 0 |  |
+| CIRCUIT_FORMAT_QASM2 | 1 |  |
+| CIRCUIT_FORMAT_QASM3 | 2 |  |
+| CIRCUIT_FORMAT_QIR | 3 |  |
+| CIRCUIT_FORMAT_QIRBASESTRING | 4 |  |
+| CIRCUIT_FORMAT_QIRBASEMODULE | 5 |  |
+| CIRCUIT_FORMAT_QIRADAPTIVESTRING | 6 |  |
+| CIRCUIT_FORMAT_QIRADAPTIVEMODULE | 7 |  |
+| CIRCUIT_FORMAT_CALIBRATION | 8 |  |
+| CIRCUIT_FORMAT_QPY | 9 |  |
+| CIRCUIT_FORMAT_IQMJSON | 10 |  |
+| CIRCUIT_FORMAT_BATCHJOB | 11 |  |
+
+
+
 <a name="mqss-protocol-v1-QsStatus"></a>
 
 ### QsStatus
@@ -538,6 +638,5 @@ original Python implementation.
  <!-- end HasExtensions -->
 
  <!-- end services -->
-
 
 

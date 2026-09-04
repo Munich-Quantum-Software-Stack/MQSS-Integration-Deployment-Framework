@@ -5,6 +5,8 @@
 #include "Logger.hpp"
 
 #include "Passes/Transforms/Dialects.h"
+#include "Passes/Transforms/Pipelines.h"
+#include "Passes/Transforms/Transforms.h"
 #include "mlir/IR/BuiltinOps.h"
 #include "mlir/IR/MLIRContext.h"
 #include "mlir/Parser/Parser.h"
@@ -12,8 +14,6 @@
 #include "mqss/Protocol.hpp"
 #include "mqss/Transport.hpp"
 #include <mlir/Dialect/Func/IR/FuncOps.h>
-#include "Passes/Transforms/Transforms.h"
-#include "Passes/Transforms/Pipelines.h"
 
 #include <array>
 #include <cstdio>
@@ -45,7 +45,6 @@ std::string stripSpuriousGateDefs(const std::string &qasm) {
   return result.str();
 }
 
-
 // Invokes MQSS Compiler Passes on the input MLIR dialect found via `src_path`.
 // Also, converts the optimized/transformed dialect to OpenQasm2 (currently).
 static std::string lowerToOutputFormat(const std::string &src_path,
@@ -65,8 +64,7 @@ static std::string lowerToOutputFormat(const std::string &src_path,
   auto contextptr = mqss::opt::createMQSSContext();
   auto mlirctx = contextptr.get();
   // 2. Parse the input MLIR dialect and create mlir::ModuleOp
-  auto module = mlir::parseSourceFile<mlir::ModuleOp>(
-      src_path, mlirctx);
+  auto module = mlir::parseSourceFile<mlir::ModuleOp>(src_path, mlirctx);
   if (!module) {
     spdlog::error("failed to parse MLIR file\n");
   }
@@ -74,20 +72,22 @@ static std::string lowerToOutputFormat(const std::string &src_path,
   // 3. Declare the Pass Manager.
   mlir::PassManager pm(mlirctx);
 
-  // 4. Register -O1 Optimization/Transformation pass pipeline in the Pass Manager
+  // 4. Register -O1 Optimization/Transformation pass pipeline in the Pass
+  // Manager
   mqss::opt::O1(pm);
   // 5. Run the Optimization/Transformation passes
-  if (mlir::failed(pm.run(*module))) { 
+  if (mlir::failed(pm.run(*module))) {
     spdlog::error("Compiler: Pipeline failed\n");
   }
 
-  // 6. Register and RUN the transpilation passes 
+  // 6. Register and RUN the transpilation passes
   //   (Currently only BasisConversion or native-gate set decomposition)
   BasisConversionPassOptions options;
-  if(target_qpu == "planqc")
-    options.gates= "rx,cz,rz";                   // Using PLANQC's native gate-set in this example
+  if (target_qpu == "planqc")
+    options.gates =
+        "rx,cz,rz"; // Using PLANQC's native gate-set in this example
   else
-   options.gates = "phased_rx, cz";             // IQM's native gate set (Not tested)
+    options.gates = "phased_rx, cz"; // IQM's native gate set (Not tested)
 
   pm.addPass(mqss::opt::createBasisConversionPass(options));
 
@@ -96,13 +96,12 @@ static std::string lowerToOutputFormat(const std::string &src_path,
   // 7. Convert the final MLIR dialect to OpenQASM2
   // Note: PLANQC backend supports OpenQASM2. The MQT-Core DDSIM QDMI device
   //       also supports OpenQASM2. Therefore in the future, the MQT-Core DDSIM
-  //       device can be easliy replaced with the PLANQC QDMI device.
-  if(result_type == "OpenQasm2"){
+  //       device can be easily replaced with the PLANQC QDMI device.
+  if (result_type == "OpenQasm2") {
     pm.addPass(mqss::opt::QuakeToQASM2Pass(resultStream));
   }
-  if (mlir::failed(pm.run(*module))) { 
+  if (mlir::failed(pm.run(*module))) {
     spdlog::error("Compiler: Conversion to {} failed", result_type);
-
   }
   return result;
 }

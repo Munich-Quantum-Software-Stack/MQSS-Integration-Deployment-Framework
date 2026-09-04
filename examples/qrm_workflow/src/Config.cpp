@@ -69,7 +69,7 @@ Config loadConfig(int argc, char **argv) {
               .compiler =
                   getEnvOr("QRM_COMPILER_QUEUE", defaults::compiler_queue),
               .results = getEnvOr("QRM_RESULTS_QUEUE", defaults::results_queue),
-               .submitter =
+              .submitter =
                   getEnvOr("QRM_SUBMITTER_QUEUE", defaults::submitter_queue),
           },
 

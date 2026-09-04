@@ -1,0 +1,18 @@
+# Global Indentation & Width
+format:
+  indent_width: 2
+  line_width: 80
+  enable_comment_formatting: false
+
+  # Controls how function arguments wrap across lines
+  algorithm: "WRAP_OPTIONAL"
+
+  # Controls whether trailing/leading parentheses dangle or stay on the same line
+  dangle_parens: true
+
+  # Separates keyword arguments onto new lines when wrapping
+  kwarg_split_space: true
+
+# Enable automatic positional argument parsing for standard and custom commands
+parse:
+  additional_commands: {}

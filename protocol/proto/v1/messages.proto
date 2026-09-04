@@ -29,7 +29,6 @@ package mqss.protocol.v1;
 
 import "google/protobuf/struct.proto";
 
-
 // Task submitted for quantum circuit execution.
 //
 // Part of the asynchronous task execution flow: QuantumTask -> QuantumResult
@@ -197,7 +196,8 @@ message QSRegistrationInfo {
   // Unique identifier assigned by the resource manager for the backend.
   int32 uid = 1;
 
-  // Endpoint where heartbeat messages should be sent (currently a RabbitMQ queue).
+  // Endpoint where heartbeat messages should be sent (currently a RabbitMQ
+  // queue).
   string heartbeat_queue = 2;
 
   // Heartbeat interval (unit unspecified).
@@ -260,6 +260,82 @@ message QResourceInfo {
   // Backend instruction information.
   // Python implementation: Optional[str].
   string instructions = 4;
+}
+
+// Circuit exchange formats
+enum CircuitFormat {
+  CIRCUIT_FORMAT_UNSPECIFIED = 0;
+  CIRCUIT_FORMAT_QASM2 = 1;
+  CIRCUIT_FORMAT_QASM3 = 2;
+  CIRCUIT_FORMAT_QIR = 3;
+  CIRCUIT_FORMAT_QIRBASESTRING = 4;
+  CIRCUIT_FORMAT_QIRBASEMODULE = 5;
+  CIRCUIT_FORMAT_QIRADAPTIVESTRING = 6;
+  CIRCUIT_FORMAT_QIRADAPTIVEMODULE = 7;
+  CIRCUIT_FORMAT_CALIBRATION = 8;
+  CIRCUIT_FORMAT_QPY = 9;
+  CIRCUIT_FORMAT_IQMJSON = 10;
+  CIRCUIT_FORMAT_BATCHJOB = 11;
+}
+
+// Type of a quantum backend
+enum BackendType {
+  BACKEND_TYPE_UNSPECIFIED = 0;
+  BACKEND_TYPE_SUPERCONDUCTING = 1;
+  BACKEND_TYPE_TRAPPED_ION = 2;
+  BACKEND_TYPE_NEUTRAL_ATOM = 3;
+  BACKEND_TYPE_PHOTONIC = 4;
+  BACKEND_TYPE_SIMULATOR = 5;
+}
+
+// Status of a quantum backend
+enum BackendStatus {
+  BACKEND_STATUS_UNSPECIFIED = 0;
+  BACKEND_STATUS_OFFLINE = 1;
+  BACKEND_STATUS_IDLE = 2;
+  BACKEND_STATUS_BUSY = 3;
+  BACKEND_STATUS_ERROR = 4;
+  BACKEND_STATUS_MAINTENANCE = 5;
+  BACKEND_STATUS_CALIBRATION = 6;
+}
+message QubitPair {
+  uint32 qubit1 = 1;
+  uint32 qubit2 = 2;
+}
+message Backend {
+  // Unique name of the backend or QPU
+  string name = 1;
+
+  // Number of qubits provided by the backend
+  uint32 num_qubits = 2;
+
+  // Type/Technology of the backend
+  BackendType type = 3;
+
+  // Status of the backend
+  BackendStatus status = 4;
+
+  // Current number of QuantumTasks in queue
+  uint32 queue_length = 5;
+
+  // Current load, usually between 0.0 - 1.0
+  // A value of 0.0 indicates no load, while 1.0 indicates full load
+  // A value greater than 1.0 indicates overload
+  // A value less than 0.0 indicates an error or unknown load
+  float current_load = 6;
+
+  // Endpoint to receives QuantumTask messages
+  // (currently a RabbitMQ queue).
+  string queue_name = 7;
+
+  // List of instructions supported by the backend
+  repeated string instructions = 8;
+
+  // Connectivity/Coupling map of the backend, represented as pair of qubit ids
+  repeated QubitPair connectivity = 9;
+
+  // Supported circuit file exchange formats/types, e.g., "qasm", "qir"
+  repeated CircuitFormat supported_circuit_formats = 10;
 }
 
 // Typed payload for creating a quantum task through the API interface.
