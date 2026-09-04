@@ -8,32 +8,32 @@ index efefbfc..fa49b13 100644
  # and then issuing `yum install cmake3` on the command line.
 -cmake_minimum_required(VERSION 3.5)
 +cmake_minimum_required(VERSION 3.24)
-
+ 
  project(SimpleAmqpClient LANGUAGES CXX)
-
+ 
 @@ -48,7 +48,7 @@ if(Boost_Dynamic_Linking_ENABLED)
    set(Boost_USE_STATIC_RUNTIME OFF)
  endif()
-
+ 
 -find_package(Boost 1.47.0 COMPONENTS chrono system REQUIRED)
 +find_package(Boost 1.47.0 CONFIG REQUIRED COMPONENTS chrono system)
  include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
  link_directories(${Boost_LIBRARY_DIRS})
-
+ 
 diff --git a/src/AmqpException.cpp b/src/AmqpException.cpp
 index c1998cf..0a404d7 100644
 --- a/src/AmqpException.cpp
 +++ b/src/AmqpException.cpp
 @@ -28,8 +28,8 @@
-
+ 
  #include "SimpleAmqpClient/AmqpException.h"
-
+ 
 -#include <amqp.h>
 -#include <amqp_framing.h>
 +#include <rabbitmq-c/amqp.h>
 +#include <rabbitmq-c/framing.h>
  #include <assert.h>
-
+ 
  #include <boost/lexical_cast.hpp>
 diff --git a/src/AmqpLibraryException.cpp b/src/AmqpLibraryException.cpp
 index 964c145..77445d5 100644
@@ -42,11 +42,11 @@ index 964c145..77445d5 100644
 @@ -29,7 +29,7 @@
  // Put these first to avoid warnings about INT#_C macro redefinition
  #include "SimpleAmqpClient/AmqpLibraryException.h"
-
+ 
 -#include <amqp.h>
 +#include <rabbitmq-c/amqp.h>
  #include <stdlib.h>
-
+ 
  namespace AmqpClient {
 diff --git a/src/AmqpResponseLibraryException.cpp b/src/AmqpResponseLibraryException.cpp
 index 2d2bbff..cb739ee 100644
@@ -55,11 +55,11 @@ index 2d2bbff..cb739ee 100644
 @@ -29,7 +29,7 @@
  // Put these first to avoid warnings about INT#_C macro redefinition
  #include "SimpleAmqpClient/AmqpResponseLibraryException.h"
-
+ 
 -#include <amqp.h>
 +#include <rabbitmq-c/amqp.h>
  #include <stdlib.h>
-
+ 
  namespace AmqpClient {
 diff --git a/src/BasicMessage.cpp b/src/BasicMessage.cpp
 index badd847..d17b3cf 100644
@@ -68,12 +68,12 @@ index badd847..d17b3cf 100644
 @@ -29,8 +29,8 @@
  // Put these first to avoid warnings about INT#_C macro redefinition
  #include "SimpleAmqpClient/BasicMessage.h"
-
+ 
 -#include <amqp.h>
 -#include <amqp_framing.h>
 +#include <rabbitmq-c/amqp.h>
 +#include <rabbitmq-c/framing.h>
-
+ 
  #include <boost/optional/optional.hpp>
  #include <cstring>
 diff --git a/src/Channel.cpp b/src/Channel.cpp
@@ -82,7 +82,7 @@ index 2cf5e0f..d5057bb 100644
 +++ b/src/Channel.cpp
 @@ -27,11 +27,11 @@
   */
-
+ 
  // Put these first to avoid warnings about INT#_C macro redefinition
 -#include <amqp.h>
 -#include <amqp_framing.h>
@@ -94,7 +94,7 @@ index 2cf5e0f..d5057bb 100644
 -#include <amqp_ssl_socket.h>
 +#include <rabbitmq-c/ssl_socket.h>
  #endif
-
+ 
  #include <string.h>
 diff --git a/src/SimpleAmqpClient/ChannelImpl.h b/src/SimpleAmqpClient/ChannelImpl.h
 index 62af935..762e8a6 100644
@@ -102,15 +102,15 @@ index 62af935..762e8a6 100644
 +++ b/src/SimpleAmqpClient/ChannelImpl.h
 @@ -29,8 +29,8 @@
   */
-
+ 
  // Put these first to avoid warnings about INT#_C macro redefinition
 -#include <amqp.h>
 -#include <amqp_framing.h>
 +#include <rabbitmq-c/amqp.h>
 +#include <rabbitmq-c/framing.h>
-
+ 
  #include <boost/array.hpp>
-
+ 
 diff --git a/src/SimpleAmqpClient/TableImpl.h b/src/SimpleAmqpClient/TableImpl.h
 index b72bc66..1823de5 100644
 --- a/src/SimpleAmqpClient/TableImpl.h
@@ -118,10 +118,10 @@ index b72bc66..1823de5 100644
 @@ -28,7 +28,7 @@
   * ***** END LICENSE BLOCK *****
   */
-
+ 
 -#include <amqp.h>
 +#include <rabbitmq-c/amqp.h>
-
+ 
  #include <boost/cstdint.hpp>
  #include <boost/shared_ptr.hpp>
 diff --git a/src/TableImpl.cpp b/src/TableImpl.cpp
@@ -129,11 +129,11 @@ index a861060..5e8a0c4 100644
 --- a/src/TableImpl.cpp
 +++ b/src/TableImpl.cpp
 @@ -32,7 +32,7 @@
-
+ 
  #include "SimpleAmqpClient/TableImpl.h"
-
+ 
 -#include <amqp.h>
 +#include <rabbitmq-c/amqp.h>
  #include <string.h>
-
+ 
  #include <algorithm>

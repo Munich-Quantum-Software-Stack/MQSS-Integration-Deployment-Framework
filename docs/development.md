@@ -7,7 +7,7 @@ Required tools:
 - CMake 3.28 or newer
 - C++23-compatible toolchain
 - protoc (Protocol Buffers compiler)
-- protoc-gen-doc (v1.5.1)
+- protoc-gen-doc (v1.5.1)  
   <https://github.com/pseudomuto/protoc-gen-doc/releases>
 - GoogleTest
 - RabbitMQ C library development package
@@ -20,7 +20,7 @@ Required for MQSS development, testing, and documentation generation:
 sudo apt install build-essential cmake protobuf-compiler libprotobuf-dev \
   libgtest-dev librabbitmq-dev libboost-chrono-dev libboost-system-dev \
   doxygen graphviz
-```
+````
 
 ### Project Examples
 
@@ -41,13 +41,13 @@ sudo apt install curl wget ninja-build libbz2-dev libssl-dev libffi-dev libboost
 
 `examples/qrm_workflow` resolves the following as external CMake dependencies, pulled in automatically via `FetchContent` (see `examples/qrm_workflow/cmake/`) rather than as apt packages:
 
-| Dependency | Repository                                                                                                        | Pinned Ref | Notes                                                                                                                                                        |
-| ---------- | ----------------------------------------------------------------------------------------------------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| MQSSCI     | [MQSS-Quantum-Compilation-Suite](https://github.com/Munich-Quantum-Software-Stack/MQSS-Quantum-Compilation-Suite) | `v2.1.0`   | Compiler passes and pipelines (`mqss-ci::mqss-ci`); declared in `cmake/FindMQSSCI.cmake`                                                                     |
-| QDMI       | [QDMI](https://github.com/Munich-Quantum-Software-Stack/QDMI.git)                                                 | `v1.3.2`   | Quantum Device Management Interface (`qdmi::qdmi`); declared in `cmake/Findqdmi.cmake`                                                                       |
-| QInfo      | [QInfo](https://github.com/Munich-Quantum-Software-Stack/QInfo.git)                                               | `develop`  | Device/circuit info utilities; declared in `cmake/Findqinfo.cmake`                                                                                           |
-| CUDA-Q     | [cuda-quantum](https://github.com/NVIDIA/cuda-quantum.git)                                                        | `0.15.0`   | MLIR Quake/CC/QEC dialects consumed by MQSSCI; auto-fetched and built from source on first configure (`CUDAQ_AUTO_FETCH`, set by `FindMQSSCI.cmake`)         |
-| Catalyst   | [catalyst](https://github.com/PennyLaneAI/catalyst.git)                                                           | `v0.15.0`  | MLIR Quantum/QRef/MBQC dialects consumed by MQSSCI; auto-fetched and built from source on first configure (`CATALYST_AUTO_FETCH`, set by `FindMQSSCI.cmake`) |
+| Dependency | Repository | Pinned Ref | Notes |
+|------------|-----------|------------|-------|
+| MQSSCI | [MQSS-Quantum-Compilation-Suite](https://github.com/Munich-Quantum-Software-Stack/MQSS-Quantum-Compilation-Suite) | `v2.1.0` | Compiler passes and pipelines (`mqss-ci::mqss-ci`); declared in `cmake/FindMQSSCI.cmake` |
+| QDMI | [QDMI](https://github.com/Munich-Quantum-Software-Stack/QDMI.git) | `v1.3.2` | Quantum Device Management Interface (`qdmi::qdmi`); declared in `cmake/Findqdmi.cmake` |
+| QInfo | [QInfo](https://github.com/Munich-Quantum-Software-Stack/QInfo.git) | `develop` | Device/circuit info utilities; declared in `cmake/Findqinfo.cmake` |
+| CUDA-Q | [cuda-quantum](https://github.com/NVIDIA/cuda-quantum.git) | `0.15.0` | MLIR Quake/CC/QEC dialects consumed by MQSSCI; auto-fetched and built from source on first configure (`CUDAQ_AUTO_FETCH`, set by `FindMQSSCI.cmake`) |
+| Catalyst | [catalyst](https://github.com/PennyLaneAI/catalyst.git) | `v0.15.0` | MLIR Quantum/QRef/MBQC dialects consumed by MQSSCI; auto-fetched and built from source on first configure (`CATALYST_AUTO_FETCH`, set by `FindMQSSCI.cmake`) |
 
 CUDA-Q and Catalyst are built from source against this project's LLVM/MLIR on first configure, which can take a long time; subsequent configures reuse the cached build under `build/_deps/`. Both require `LLVM_DIR`/`MLIR_DIR` to already be set (i.e. `find_package(MLIR CONFIG)` must run before `find_package(MQSSCI)`).
 

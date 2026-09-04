@@ -5,22 +5,20 @@
 # existing build tree. Since 'git apply' is not idempotent, re-applying an
 # already applied patch would fail.
 #
-# This helper checks whether the patch is already applied before attempting to
-# apply it again.
+# This helper checks whether the patch is already applied before attempting
+# to apply it again.
 
-if(NOT GIT_EXECUTABLE
-   OR NOT PATCH_FILE
-   OR NOT SOURCE_DIR)
-  message(
-    FATAL_ERROR
-      "Missing required variables: GIT_EXECUTABLE, PATCH_FILE, or SOURCE_DIR")
+if(NOT GIT_EXECUTABLE OR NOT PATCH_FILE OR NOT SOURCE_DIR)
+  message(FATAL_ERROR "Missing required variables: GIT_EXECUTABLE, PATCH_FILE, or SOURCE_DIR")
 endif()
 
 execute_process(
   COMMAND "${GIT_EXECUTABLE}" apply --check --reverse "${PATCH_FILE}"
   WORKING_DIRECTORY "${SOURCE_DIR}"
   RESULT_VARIABLE reverse_check_result
-  OUTPUT_QUIET ERROR_QUIET)
+  OUTPUT_QUIET
+  ERROR_QUIET
+)
 
 if(reverse_check_result EQUAL 0)
   message(STATUS "Patch already applied: ${PATCH_FILE}")
@@ -30,7 +28,8 @@ else()
   execute_process(
     COMMAND "${GIT_EXECUTABLE}" apply --ignore-whitespace "${PATCH_FILE}"
     WORKING_DIRECTORY "${SOURCE_DIR}"
-    RESULT_VARIABLE apply_result)
+    RESULT_VARIABLE apply_result
+  )
 
   if(NOT apply_result EQUAL 0)
     message(FATAL_ERROR "Failed to apply patch: ${PATCH_FILE}")

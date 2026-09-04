@@ -19,18 +19,18 @@ The current implementation does not apply command-line overrides. Therefore, QOf
 
 ## Configuration Files
 
-- `Config.cmake`
+- `Config.cmake`  
   Defines path defaults that depend on the build-system context.
   The values are exposed as CMake cache variables, so they can be changed when configuring the build.
   CMake substitutes these values into `ConfigDefaults.hpp.in` to produce the generated defaults header.
 
-- `ConfigDefaults.hpp.in`
+- `ConfigDefaults.hpp.in`  
   Template for the generated C++ defaults header.
   It contains the complete set of QOffload build-time defaults, including RabbitMQ connections, queue names, identity, policy, logging, and runtime paths.
   Most defaults are fixed constants in the template.
   The runtime, log, and state-file paths contain CMake placeholders populated from `Config.cmake` during configuration.
 
-- `include/qoffload/Config.hpp`
+- `include/qoffload/Config.hpp`  
   Defines the application-facing configuration model and integrates it with the common configuration library.
   The module defines typed configuration structures for all application settings, constructs the initial configuration from generated defaults, applies environment-variable and command-line overrides (currently unused).
   It initializes the process-wide configuration and provides read-only access to it.
@@ -39,36 +39,36 @@ The current implementation does not apply command-line overrides. Therefore, QOf
 
 The following table lists the effective defaults before environment-variable overrides are applied.
 
-| Configuration field       | C++ type        |                                Default value | Defined by              | Description                                               |
+| Configuration field       | C++ type        | Default value                                | Defined by              | Description                                               |
 | ------------------------- | --------------- | -------------------------------------------: | ----------------------- | --------------------------------------------------------- |
-| `rabbitmq.host`           | `std::string`   |                                  `localhost` | `ConfigDefaults.hpp.in` | Client-facing broker host.                                |
-| `rabbitmq.port`           | `int`           |                                       `5672` | `ConfigDefaults.hpp.in` | Client-facing broker port.                                |
-| `rabbitmq.user`           | `std::string`   |                                      `guest` | `ConfigDefaults.hpp.in` | Client-facing broker username.                            |
-| `rabbitmq.password`       | `std::string`   |                                      `guest` | `ConfigDefaults.hpp.in` | Client-facing broker password.                            |
-| `rabbitmq.vhost`          | `std::string`   |                                          `/` | `ConfigDefaults.hpp.in` | Client-facing broker virtual host.                        |
-| `qrm_rabbitmq.host`       | `std::string`   |                                  `127.0.0.1` | `ConfigDefaults.hpp.in` | QRM broker host.                                          |
-| `qrm_rabbitmq.port`       | `int`           |                                       `5672` | `ConfigDefaults.hpp.in` | QRM broker port.                                          |
-| `qrm_rabbitmq.user`       | `std::string`   |                                      `guest` | `ConfigDefaults.hpp.in` | QRM broker username.                                      |
-| `qrm_rabbitmq.password`   | `std::string`   |                                      `guest` | `ConfigDefaults.hpp.in` | QRM broker password.                                      |
-| `qrm_rabbitmq.vhost`      | `std::string`   |                                          `/` | `ConfigDefaults.hpp.in` | QRM broker virtual host.                                  |
-| `queues.request`          | `std::string`   |           `qoffload_request_reception_queue` | `ConfigDefaults.hpp.in` | Queue for task submission requests.                       |
-| `queues.control_request`  | `std::string`   |       `qoffload_api_request_reception_queue` | `ConfigDefaults.hpp.in` | Queue for control API requests.                           |
-| `queues.result`           | `std::string`   |            `qoffload_result_reception_queue` | `ConfigDefaults.hpp.in` | Queue for completed task results.                         |
-| `queues.qrm_task`         | `std::string`   |              `quantum_task_collection_queue` | `ConfigDefaults.hpp.in` | Queue for QRM task submissions.                           |
-| `identity.instance_uid`   | `std::uint64_t` |                                          `0` | `ConfigDefaults.hpp.in` | Used to generate local task identifiers.                  |
-| `identity.user_identity`  | `std::string`   |                              `qoffload_user` | `ConfigDefaults.hpp.in` | QRM task owner.                                           |
-| `logging.enabled`         | `bool`          |                                       `true` | `ConfigDefaults.hpp.in` | Enables the logging subsystem.                            |
-| `logging.console_enabled` | `bool`          |                                       `true` | `ConfigDefaults.hpp.in` | Writes log messages to the console.                       |
-| `logging.file_enabled`    | `bool`          |                                      `false` | `ConfigDefaults.hpp.in` | Writes log messages to disk files.                        |
-| `logging.level`           | `LogLevel`      |                                       `info` | `ConfigDefaults.hpp.in` | Log verbosity level.                                      |
-| `logging.file_mode`       | `LogFileMode`   |                                     `rotate` | `ConfigDefaults.hpp.in` | File writing strategy.                                    |
-| `logging.rotation_size`   | `std::size_t`   |                  `10,485,760` bytes (10 MiB) | `ConfigDefaults.hpp.in` | Maximum log file size before rotation.                    |
-| `logging.rotation_files`  | `std::size_t`   |                                          `3` | `ConfigDefaults.hpp.in` | Maximum number of rotated log files.                      |
-| `paths.runtime_dir`       | `std::string`   |        `${CMAKE_CURRENT_BINARY_DIR}/runtime` | `Config.cmake`          | Directory for runtime-generated files.                    |
-| `paths.log_dir`           | `std::string`   |               `${QOFFLOAD_RUNTIME_DIR}/logs` | `Config.cmake`          | Directory for stored log files.                           |
+| `rabbitmq.host`           | `std::string`   | `localhost`                                  | `ConfigDefaults.hpp.in` | Client-facing broker host.                                |
+| `rabbitmq.port`           | `int`           | `5672`                                       | `ConfigDefaults.hpp.in` | Client-facing broker port.                                |
+| `rabbitmq.user`           | `std::string`   | `guest`                                      | `ConfigDefaults.hpp.in` | Client-facing broker username.                            |
+| `rabbitmq.password`       | `std::string`   | `guest`                                      | `ConfigDefaults.hpp.in` | Client-facing broker password.                            |
+| `rabbitmq.vhost`          | `std::string`   | `/`                                          | `ConfigDefaults.hpp.in` | Client-facing broker virtual host.                        |
+| `qrm_rabbitmq.host`       | `std::string`   | `127.0.0.1`                                  | `ConfigDefaults.hpp.in` | QRM broker host.                                          |
+| `qrm_rabbitmq.port`       | `int`           | `5672`                                       | `ConfigDefaults.hpp.in` | QRM broker port.                                          |
+| `qrm_rabbitmq.user`       | `std::string`   | `guest`                                      | `ConfigDefaults.hpp.in` | QRM broker username.                                      |
+| `qrm_rabbitmq.password`   | `std::string`   | `guest`                                      | `ConfigDefaults.hpp.in` | QRM broker password.                                      |
+| `qrm_rabbitmq.vhost`      | `std::string`   | `/`                                          | `ConfigDefaults.hpp.in` | QRM broker virtual host.                                  |
+| `queues.request`          | `std::string`   | `qoffload_request_reception_queue`           | `ConfigDefaults.hpp.in` | Queue for task submission requests.                       |
+| `queues.control_request`  | `std::string`   | `qoffload_api_request_reception_queue`       | `ConfigDefaults.hpp.in` | Queue for control API requests.                           |
+| `queues.result`           | `std::string`   | `qoffload_result_reception_queue`            | `ConfigDefaults.hpp.in` | Queue for completed task results.                         |
+| `queues.qrm_task`         | `std::string`   | `quantum_task_collection_queue`              | `ConfigDefaults.hpp.in` | Queue for QRM task submissions.                           |
+| `identity.instance_uid`   | `std::uint64_t` | `0`                                          | `ConfigDefaults.hpp.in` | Used to generate local task identifiers.                  |
+| `identity.user_identity`  | `std::string`   | `qoffload_user`                              | `ConfigDefaults.hpp.in` | QRM task owner.                                           |
+| `logging.enabled`         | `bool`          | `true`                                       | `ConfigDefaults.hpp.in` | Enables the logging subsystem.                            |
+| `logging.console_enabled` | `bool`          | `true`                                       | `ConfigDefaults.hpp.in` | Writes log messages to the console.                       |
+| `logging.file_enabled`    | `bool`          | `false`                                      | `ConfigDefaults.hpp.in` | Writes log messages to disk files.                        |
+| `logging.level`           | `LogLevel`      | `info`                                       | `ConfigDefaults.hpp.in` | Log verbosity level.                                      |
+| `logging.file_mode`       | `LogFileMode`   | `rotate`                                     | `ConfigDefaults.hpp.in` | File writing strategy.                                    |
+| `logging.rotation_size`   | `std::size_t`   | `10,485,760` bytes (10 MiB)                  | `ConfigDefaults.hpp.in` | Maximum log file size before rotation.                    |
+| `logging.rotation_files`  | `std::size_t`   | `3`                                          | `ConfigDefaults.hpp.in` | Maximum number of rotated log files.                      |
+| `paths.runtime_dir`       | `std::string`   | `${CMAKE_CURRENT_BINARY_DIR}/runtime`        | `Config.cmake`          | Directory for runtime-generated files.                    |
+| `paths.log_dir`           | `std::string`   | `${QOFFLOAD_RUNTIME_DIR}/logs`               | `Config.cmake`          | Directory for stored log files.                           |
 | `paths.state_file`        | `std::string`   | `${QOFFLOAD_RUNTIME_DIR}/qoffload-state.bin` | `Config.cmake`          | Path to persistent application state file.                |
-| `policy.hpc_node`         | `bool`          |                                      `false` | `ConfigDefaults.hpp.in` | Indicates the access path: HPC (`true`) or MQP (`false`). |
-| `policy.resume_state`     | `bool`          |                                      `false` | `ConfigDefaults.hpp.in` | Restores persisted application state on startup.          |
+| `policy.hpc_node`         | `bool`          | `false`                                      | `ConfigDefaults.hpp.in` | Indicates the access path: HPC (`true`) or MQP (`false`). |
+| `policy.resume_state`     | `bool`          | `false`                                      | `ConfigDefaults.hpp.in` | Restores persisted application state on startup.          |
 
 The path values defined in `Config.cmake` are CMake cache entries, so their effective defaults depend on the configured build directory and any cache values provided during CMake configuration.
 

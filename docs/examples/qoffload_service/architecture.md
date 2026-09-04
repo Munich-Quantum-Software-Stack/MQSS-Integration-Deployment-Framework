@@ -100,7 +100,7 @@ Supported protocols:
 
   Uses the same protobuf transport but encodes REST semantics in generic fields such as method and path.
   This implementation is largely compatible with the Python reference implementation.
-  The primary difference is response serialization.
+  The primary difference is response serialization.  
   The C++ implementation always serializes an `APIResponse` message, whereas the Python implementation returns some responses as top-level JSON objects instead of wrapping them in an `APIResponse`.
 
 ### TaskStore

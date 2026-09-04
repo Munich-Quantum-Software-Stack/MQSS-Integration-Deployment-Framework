@@ -48,9 +48,8 @@ Example benchmark circuits (in MLIR dialect representation) are provided in:
 benchmarks/
 ```
 
-Note: The `bell_state.mlir` example is used for demonstration purposes.
+Note: The ```bell_state.mlir``` example is used for demonstration purposes.
 Path to this circuit is hard-coded within the Daemon.
-
 ## RabbitMQ Setup
 
 RabbitMQ installation and configuration are described in:
