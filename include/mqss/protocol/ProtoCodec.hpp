@@ -60,7 +60,11 @@ struct Codec<T, ProtoJson> {
     Envelope envelope;
     std::string json;
 
-    auto status = google::protobuf::util::MessageToJsonString(msg, &json);
+    google::protobuf::util::JsonPrintOptions options;
+    options.preserve_proto_field_names = true;
+
+    auto status =
+        google::protobuf::util::MessageToJsonString(msg, &json, options);
     if (!status.ok()) {
       return std::unexpected(
           Status::serialization("protobuf JSON serialization failed"));
