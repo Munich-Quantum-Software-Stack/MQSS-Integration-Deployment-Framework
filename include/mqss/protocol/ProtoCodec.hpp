@@ -66,8 +66,9 @@ struct Codec<T, ProtoJson> {
     auto status =
         google::protobuf::util::MessageToJsonString(msg, &json, options);
     if (!status.ok()) {
-      return std::unexpected(Status::serialization(
-          "protobuf JSON serialization failed: " + status.message()));
+      return std::unexpected(
+          Status::serialization("protobuf JSON serialization failed: " +
+                                status.message().ToString()));
     }
 
     envelope.payload = std::move(json);
@@ -83,7 +84,7 @@ struct Codec<T, ProtoJson> {
         google::protobuf::util::JsonStringToMessage(envelope.payload, &msg);
     if (!status.ok()) {
       return std::unexpected(Status::serialization(
-          "protobuf JSON parse failed: " + status.message()));
+          "protobuf JSON parse failed: " + status.message().ToString()));
     }
 
     return msg;
