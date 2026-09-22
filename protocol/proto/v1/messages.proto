@@ -40,7 +40,7 @@ import "google/protobuf/struct.proto";
 message QuantumTask {
   // Unique task identifier.
   // Python implementation: int.
-  int32 task_id = 1;
+  int64 task_id = 1;
 
   // Number of qubits.
   int32 n_qbits = 2;
@@ -126,7 +126,7 @@ message CircuitResult {
 // execution outcome back through the system to the result destination.
 message QuantumResult {
   // Identifier of the task this result belongs to.
-  int32 task_id = 1;
+  int64 task_id = 1;
 
   // Measurement results for executed circuits.
   // Each entry contains counts for measurement bitstrings produced by
