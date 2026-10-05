@@ -19,8 +19,17 @@ Required for MQSS development, testing, and documentation generation:
 ```bash
 sudo apt install build-essential cmake protobuf-compiler libprotobuf-dev \
   libgtest-dev librabbitmq-dev libboost-chrono-dev libboost-system-dev \
-  doxygen graphviz
-````
+  doxygen graphviz python3 python3-venv
+```
+
+For building the documentation site, install the pinned MkDocs dependencies
+in a Python virtual environment:
+
+```bash
+python3 -m venv .venv-docs
+. .venv-docs/bin/activate
+python -m pip install "mkdocs==1.6.1" "mkdocs-material==9.7.7"
+```
 
 ### Project Examples
 
@@ -189,8 +198,20 @@ DOWN=1 scripts/docker_workflow.sh
 scripts/gen_proto_docs.sh
 ```
 
-## Generate Doxygen Documentation
+## Build Documentation
+
+Generate the Doxygen API documentation and build the complete documentation site:
 
 ```bash
 doxygen Doxyfile
+mkdocs build --strict
+```
+
+The generated site is written to `site/`.
+
+For local development and live preview:
+
+```bash
+doxygen Doxyfile
+mkdocs serve
 ```

@@ -19,8 +19,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libboost-chrono-dev \
     libboost-system-dev \
     libboost-graph-dev \
+    \
+    # Documentation dependencies
     doxygen \
     graphviz \
+    python3 \
+    python3-venv \
+    \
     # Project examples
     libspdlog-dev \
     libfmt-dev \
@@ -39,6 +44,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libssl-dev \
     libffi-dev \
   && rm -rf /var/lib/apt/lists/*
+
+RUN python3 -m venv /opt/mkdocs \
+ && /opt/mkdocs/bin/pip install --no-cache-dir \
+      "mkdocs==1.6.1" \
+      "mkdocs-material==9.7.7"
+
+ENV PATH="/opt/mkdocs/bin:${PATH}"
 
 WORKDIR /workspace
 
