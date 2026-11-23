@@ -4,7 +4,7 @@
 # CMake 3.28+ is required for FetchContent_Declare(EXCLUDE_FROM_ALL)
 # used by SimpleAmqpClient integration.
 cmake_minimum_required(VERSION 3.28)
-project(mqss_integration LANGUAGES CXX)
+project(mqss_integration VERSION 0.1.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
