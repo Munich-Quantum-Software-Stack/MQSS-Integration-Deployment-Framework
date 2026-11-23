@@ -379,7 +379,7 @@ execution outcome back through the system to the result destination.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| task_id | int32 |  | Identifier of the task this result belongs to. |
+| task_id | int64 |  | Identifier of the task this result belongs to. |
 | results | CircuitResult | repeated | Measurement results for executed circuits. Each entry contains counts for measurement bitstrings produced by repeated circuit execution (shots). Python representation: list[dict[str, int]] |
 | destination | string |  | Endpoint where the result message is delivered. |
 | execution_status | bool |  | Indicates whether execution completed successfully. |
@@ -408,7 +408,7 @@ execution.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| task_id | int32 |  | Unique task identifier. Python implementation: int. |
+| task_id | int64 |  | Unique task identifier. Python implementation: int. |
 | n_qbits | int32 |  | Number of qubits. |
 | n_shots | int32 |  | Number of shots. |
 | circuit_files | string | repeated | Circuit file references. Earlier implementations also accepted a legacy field "circuit_file". |
